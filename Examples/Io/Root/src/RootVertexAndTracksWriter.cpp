@@ -98,6 +98,10 @@ FW::RootVertexAndTracksWriter::RootVertexAndTracksWriter(
     m_outputTree->Branch("trkCov65", &m_ptrCov65);
     m_outputTree->Branch("trkCov66", &m_ptrCov66);
   }
+
+  txtfile.open(cfg.txtName); 
+  txtfile<< "Dump Truth information " << std::endl;
+
 }
 
 FW::RootVertexAndTracksWriter::~RootVertexAndTracksWriter() {
@@ -185,14 +189,33 @@ FW::ProcessCode FW::RootVertexAndTracksWriter::writeT(
 
   // Get the event number
   m_eventNr = context.eventNumber;
+  std::cout<< "Event Number: " << m_eventNr << std::endl; 
+  txtfile<< "Event: " << m_eventNr << std::endl; 
+  int vertex_count = 0; 
 
   for (auto& vertexAndTracks : vertexAndTracksCollection) {
+    std::cout<< "Vertex Number: " << vertex_count << std::endl;
+    txtfile<< "Vertex: " << vertex_count << " at " 
+    <<"(" 
+    << vertexAndTracks.vertex.position().x() << "," 
+    << vertexAndTracks.vertex.position().y() << ","
+    << vertexAndTracks.vertex.position().z() << ")"  
+    << " with " << vertexAndTracks.tracks.size() << " tracks. "
+    << std::endl; 
+
     // Collect the vertex information
     m_vx.push_back(vertexAndTracks.vertex.position().x());
     m_vy.push_back(vertexAndTracks.vertex.position().y());
     m_vz.push_back(vertexAndTracks.vertex.position().z());
+    vertex_count++;
 
+    int track_count = 0;
+    // std::cout<< "Vertex Size: " << vertexAndTracks.tracks.size() << std::endl;
+    
     for (auto& track : vertexAndTracks.tracks) {
+      //std::cout<< "Track Number: " << track_count << std::endl;
+
+
       // Collect the track information
       m_d0.push_back(track.parameters()[Acts::ParDef::eLOC_D0]);
       m_z0.push_back(track.parameters()[Acts::ParDef::eLOC_Z0]);
@@ -247,6 +270,42 @@ FW::ProcessCode FW::RootVertexAndTracksWriter::writeT(
       m_cov64.push_back(cov(5, 3));
       m_cov65.push_back(cov(5, 4));
       m_cov66.push_back(cov(5, 5));
+
+      txtfile<< "Track: " << track_count  << " ("
+        << track.parameters()[Acts::ParDef::eLOC_D0] << "," 
+        << track.parameters()[Acts::ParDef::eLOC_Z0] << ","
+        << track.parameters()[Acts::ParDef::ePHI] << ","
+        << track.parameters()[Acts::ParDef::eTHETA] <<  ","
+        << track.parameters()[Acts::ParDef::eQOP] << ","
+        << track.parameters()[Acts::ParDef::eT] << ") "
+        << std::endl; 
+
+      txtfile<< " \t " << "cov 0:"  << " ("
+        << cov(1, 0) << "," << cov(1, 1) << "," << cov(1, 2) << "," 
+        << cov(1, 3) << "," << cov(1, 4) << "," << cov(1, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 1:"  << " ("
+        << cov(2, 0) << "," << cov(2, 1) << "," << cov(2, 2) << "," 
+        << cov(2, 3) << "," << cov(2, 4) << "," << cov(2, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 2:"  << " ("
+        << cov(3, 0) << "," << cov(3, 1) << "," << cov(3, 2) << "," 
+        << cov(3, 3) << "," << cov(3, 4) << "," << cov(3, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 3:"  << " ("
+        << cov(4, 0) << "," << cov(4, 1) << "," << cov(4, 2) << "," 
+        << cov(4, 3) << "," << cov(4, 4) << "," << cov(4, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 4:"  << " ("
+        << cov(5, 0) << "," << cov(5, 1) << "," << cov(5, 2) << "," 
+        << cov(5, 3) << "," << cov(5, 4) << "," << cov(5, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 5:"  << " ("
+        << cov(6, 0) << "," << cov(6, 1) << "," << cov(6, 2) << "," 
+        << cov(6, 3) << "," << cov(6, 4) << "," << cov(6, 5) << ")" 
+        << std::endl; 
+
+      track_count++;
     }
   }
 

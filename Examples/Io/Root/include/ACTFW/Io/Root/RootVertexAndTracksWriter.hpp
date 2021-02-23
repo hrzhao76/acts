@@ -9,6 +9,7 @@
 #pragma once
 
 #include <mutex>
+#include <fstream>
 
 #include "ACTFW/Framework/WriterT.hpp"
 #include "ACTFW/TruthTracking/VertexAndTracks.hpp"
@@ -35,6 +36,8 @@ class RootVertexAndTracksWriter final
     std::string filePath;               ///< path of the output file
     std::string fileMode = "RECREATE";  ///< file access mode
     std::string treeName = "event";     ///< name of the output tree
+    std::string txtName = "vertex_tracks.txt";     ///< name of the output txt file
+
     TFile* rootFile = nullptr;          ///< common root file
   };
 
@@ -63,6 +66,7 @@ class RootVertexAndTracksWriter final
   std::mutex m_writeMutex;  ///< Mutex used to protect multi-threaded writes
   TFile* m_outputFile{nullptr};  ///< The output file
   TTree* m_outputTree{nullptr};  ///< The output tree
+  std::ofstream txtfile;
   int m_eventNr{0};              ///< the event number of
 
   /// The vertex positions
