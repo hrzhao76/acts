@@ -281,29 +281,30 @@ FW::ProcessCode FW::RootVertexAndTracksWriter::writeT(
         << std::endl; 
 
       txtfile<< " \t " << "cov 0:"  << " ("
+        << cov(0, 0) << "," << cov(0, 1) << "," << cov(0, 2) << "," 
+        << cov(0, 3) << "," << cov(0, 4) << "," << cov(0, 5) << ")" 
+        << std::endl; 
+      txtfile<< " \t " << "cov 2:"  << " ("
         << cov(1, 0) << "," << cov(1, 1) << "," << cov(1, 2) << "," 
         << cov(1, 3) << "," << cov(1, 4) << "," << cov(1, 5) << ")" 
         << std::endl; 
-      txtfile<< " \t " << "cov 1:"  << " ("
+      txtfile<< " \t " << "cov 3:"  << " ("
         << cov(2, 0) << "," << cov(2, 1) << "," << cov(2, 2) << "," 
         << cov(2, 3) << "," << cov(2, 4) << "," << cov(2, 5) << ")" 
         << std::endl; 
-      txtfile<< " \t " << "cov 2:"  << " ("
+      txtfile<< " \t " << "cov 4:"  << " ("
         << cov(3, 0) << "," << cov(3, 1) << "," << cov(3, 2) << "," 
         << cov(3, 3) << "," << cov(3, 4) << "," << cov(3, 5) << ")" 
         << std::endl; 
-      txtfile<< " \t " << "cov 3:"  << " ("
+      txtfile<< " \t " << "cov 5:"  << " ("
         << cov(4, 0) << "," << cov(4, 1) << "," << cov(4, 2) << "," 
         << cov(4, 3) << "," << cov(4, 4) << "," << cov(4, 5) << ")" 
         << std::endl; 
-      txtfile<< " \t " << "cov 4:"  << " ("
+      txtfile<< " \t " << "cov 6:"  << " ("
         << cov(5, 0) << "," << cov(5, 1) << "," << cov(5, 2) << "," 
         << cov(5, 3) << "," << cov(5, 4) << "," << cov(5, 5) << ")" 
         << std::endl; 
-      txtfile<< " \t " << "cov 5:"  << " ("
-        << cov(6, 0) << "," << cov(6, 1) << "," << cov(6, 2) << "," 
-        << cov(6, 3) << "," << cov(6, 4) << "," << cov(6, 5) << ")" 
-        << std::endl; 
+
 
       track_count++;
     }
