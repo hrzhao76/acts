@@ -49,6 +49,9 @@ class RootVertexPerformanceWriter final
     std::string outputFilename = "vertexingperformance.root";
     /// Name of the output tree.
     std::string outputTreename = "vertextree";
+
+    /// Name of the output tree of truth info.
+    std::string outputTreename_Truth = "truth_vertex";
     /// File access mode.
     std::string fileMode = "RECREATE";
     /// Common root file.
@@ -81,6 +84,7 @@ class RootVertexPerformanceWriter final
   std::mutex m_writeMutex;  ///< Mutex used to protect multi-threaded writes
   TFile* m_outputFile{nullptr};  ///< The output file
   TTree* m_outputTree{nullptr};  ///< The output tree
+  TTree* m_outputTree_Truth{nullptr};  ///< The output tree for truth info
 
   std::vector<float>
       m_diffx;  ///< Difference in x positon between reco and true vtx
@@ -95,6 +99,20 @@ class RootVertexPerformanceWriter final
   int m_nVtxReconstructable =
       -1;  ///< Max. number of reconstructable vertices (detector acceptance +
            ///< tracking efficiency)
+
+    /// The vertex positions
+  std::vector<double> m_vx;
+  std::vector<double> m_vy;
+  std::vector<double> m_vz;
+
+  /// The track parameter
+  std::vector<double> m_d0;
+  std::vector<double> m_z0;
+  std::vector<double> m_phi;
+  std::vector<double> m_theta;
+  std::vector<double> m_qp;
+  std::vector<double> m_time;
+  std::vector<int> m_vtxID;
 
   int getNumberOfReconstructableVertices(
       const SimParticleContainer& collection) const;
