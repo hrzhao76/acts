@@ -72,6 +72,8 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
   m_outputFile->cd();
   m_outputTree =
       new TTree(m_cfg.outputTreename.c_str(), m_cfg.outputTreename.c_str());
+  m_outputTree_Reco =
+      new TTree(m_cfg.outputTreename_Reco.c_str(), m_cfg.outputTreename_Reco.c_str());
   if (m_outputTree == nullptr)
     throw std::bad_alloc();
   else {
@@ -83,6 +85,22 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
     m_outputTree->Branch("nTrueVtx", &m_ntrueVtx);
     m_outputTree->Branch("nVtxDetectorAcceptance", &m_nVtxDetAcceptance);
     m_outputTree->Branch("nVtxReconstructable", &m_nVtxReconstructable);
+    
+    m_outputTree_Reco->Branch("event_nr", &m_eventNr);
+    m_outputTree_Reco->Branch("reco_vtx_vx",&m_reco_vtx_vx);
+    m_outputTree_Reco->Branch("reco_vtx_vy",&m_reco_vtx_vy);
+    m_outputTree_Reco->Branch("reco_vtx_vz",&m_reco_vtx_vz);
+    m_outputTree_Reco->Branch("reco_vtx_fitquality_chiSquared",&m_reco_vtx_fitquality_chiSquared);
+    m_outputTree_Reco->Branch("reco_vtx_fitquality_nDoF",&m_reco_vtx_fitquality_nDoF);
+
+    m_outputTree_Reco->Branch("reco_vtx_trk_d0",&m_reco_vtx_trk_d0);
+    m_outputTree_Reco->Branch("reco_vtx_trk_z0",&m_reco_vtx_trk_z0);
+    m_outputTree_Reco->Branch("reco_vtx_trk_phi",&m_reco_vtx_trk_phi);
+    m_outputTree_Reco->Branch("reco_vtx_trk_theta",&m_reco_vtx_trk_theta);
+    m_outputTree_Reco->Branch("reco_vtx_trk_qp",&m_reco_vtx_trk_qp);
+    m_outputTree_Reco->Branch("reco_vtx_trk_time",&m_reco_vtx_trk_time);
+    m_outputTree_Reco->Branch("reco_vtx_trk_vtxID",&m_reco_vtx_trk_vtxID);
+
   }
 }
 
@@ -96,6 +114,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::endRun() {
   if (m_outputFile) {
     m_outputFile->cd();
     m_outputTree->Write();
+    m_outputTree_Reco->Write();
   }
   return ProcessCode::SUCCESS;
 }
@@ -153,7 +172,8 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     const std::vector<Acts::Vertex<Acts::BoundTrackParameters>>& vertices) {
   // Exclusive access to the tree while writing
   std::lock_guard<std::mutex> lock(m_writeMutex);
-
+  // Event Number 
+  m_eventNr = ctx.eventNumber;
   m_nrecoVtx = vertices.size();
 
   ACTS_DEBUG("Number of reco vertices in event: " << m_nrecoVtx);
@@ -212,6 +232,13 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     // Loop over all reco vertices and find associated truth particles
     std::vector<SimParticleContainer> truthParticlesAtVtxContainer;
     for (const auto& vtx : vertices) {
+      m_reco_vtx_vx.push_back(vtx.position().x());
+      m_reco_vtx_vy.push_back(vtx.position().y());
+      m_reco_vtx_vz.push_back(vtx.position().z());
+
+      m_reco_vtx_fitquality_chiSquared.push_back(vtx.fitQuality().first);
+      m_reco_vtx_fitquality_nDoF.push_back(vtx.fitQuality().second);
+
       const auto tracks = vtx.tracks();
       // Store all associated truth particles to current vtx
       SimParticleContainer particleAtVtx;
@@ -220,6 +247,16 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
 
       for (const auto& trk : tracks) {
         Acts::BoundTrackParameters origTrack = *(trk.originalParams);
+        m_reco_vtx_trk_d0.push_back(origTrack.parameters()[0]);
+        m_reco_vtx_trk_z0.push_back(origTrack.parameters()[1]);
+        m_reco_vtx_trk_phi.push_back(origTrack.parameters()[2]);
+        m_reco_vtx_trk_theta.push_back(origTrack.parameters()[3]);
+        m_reco_vtx_trk_qp.push_back(origTrack.parameters()[4]);
+        m_reco_vtx_trk_time.push_back(origTrack.parameters()[5]);
+
+        // Current vertex index as vertex ID
+        m_reco_vtx_trk_vtxID.push_back(m_reco_vtx_vx.size() - 1);
+
 
         // Find associated truth particle now
         int idx = 0;
@@ -278,10 +315,25 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
 
   // fill the variables
   m_outputTree->Fill();
+  m_outputTree_Reco->Fill();
 
   m_diffx.clear();
   m_diffy.clear();
   m_diffz.clear();
 
+  m_reco_vtx_vx.clear();
+  m_reco_vtx_vy.clear();
+  m_reco_vtx_vz.clear();
+  m_reco_vtx_fitquality_chiSquared.clear();
+  m_reco_vtx_fitquality_nDoF.clear();
+
+  m_reco_vtx_trk_d0.clear();
+  m_reco_vtx_trk_z0.clear();
+  m_reco_vtx_trk_phi.clear();
+  m_reco_vtx_trk_theta.clear();
+  m_reco_vtx_trk_qp.clear();
+  m_reco_vtx_trk_time.clear();
+
+  m_reco_vtx_trk_vtxID.clear();
   return ProcessCode::SUCCESS;
 }
