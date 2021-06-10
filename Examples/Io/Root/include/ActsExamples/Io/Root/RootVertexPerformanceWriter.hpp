@@ -20,6 +20,11 @@
 class TFile;
 class TTree;
 
+struct PV {
+  double PV_loc[3];
+  std::vector<int> track_ID;
+};
+
 namespace ActsExamples {
 
 /// @class RootVertexPerformanceWriter
@@ -51,7 +56,7 @@ class RootVertexPerformanceWriter final
     std::string outputTreename = "vertextree";
 
     /// Name of the output tree of truth info.
-    std::string outputTreename_Truth = "truth_vertex";
+    std::string outputTreename_Truth = "Truth_Vertex";
     /// File access mode.
     std::string fileMode = "RECREATE";
     /// Common root file.
@@ -86,6 +91,8 @@ class RootVertexPerformanceWriter final
   TTree* m_outputTree{nullptr};  ///< The output tree
   TTree* m_outputTree_Truth{nullptr};  ///< The output tree for truth info
 
+  int m_eventNr{0}; 
+
   std::vector<float>
       m_diffx;  ///< Difference in x positon between reco and true vtx
   std::vector<float>
@@ -100,22 +107,28 @@ class RootVertexPerformanceWriter final
       -1;  ///< Max. number of reconstructable vertices (detector acceptance +
            ///< tracking efficiency)
 
-    /// The vertex positions
-  std::vector<double> m_vx;
-  std::vector<double> m_vy;
-  std::vector<double> m_vz;
+  /// For reco vtx information 
+  std::vector<double> m_truth_vtx_vx;
+  std::vector<double> m_truth_vtx_vy;
+  std::vector<double> m_truth_vtx_vz;
 
-  /// The track parameter
-  std::vector<double> m_d0;
-  std::vector<double> m_z0;
-  std::vector<double> m_phi;
-  std::vector<double> m_theta;
-  std::vector<double> m_qp;
-  std::vector<double> m_time;
-  std::vector<int> m_vtxID;
+  /// The track parameter associated to the vtx 
+  std::vector<double> m_truth_vtx_trk_d0;
+  std::vector<double> m_truth_vtx_trk_z0;
+  std::vector<double> m_truth_vtx_trk_phi;
+  std::vector<double> m_truth_vtx_trk_theta;
+  std::vector<double> m_truth_vtx_trk_qp;
+  std::vector<double> m_truth_vtx_trk_time;
+  std::vector<int> m_truth_vtx_trk_vtxID;
 
   int getNumberOfReconstructableVertices(
       const SimParticleContainer& collection) const;
+
+  std::vector<PV > getTruthVerticesVec(
+      const SimParticleContainer& collection);
+
+  void writeTruthInfo(const TrackParametersContainer& inputFittedTracks,  
+      std::vector<PV > PV_list);
 
   int getNumberOfTruePriVertices(const SimParticleContainer& collection) const;
 };

@@ -86,17 +86,17 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
     m_outputTree->Branch("nVtxDetectorAcceptance", &m_nVtxDetAcceptance);
     m_outputTree->Branch("nVtxReconstructable", &m_nVtxReconstructable);
 
-    m_outputTree_Truth->Branch("vx", &m_vx);
-    m_outputTree_Truth->Branch("vy", &m_vy);
-    m_outputTree_Truth->Branch("vz", &m_vz);
+    m_outputTree_Truth->Branch("truth_vtx_vx", &m_truth_vtx_vx);
+    m_outputTree_Truth->Branch("truth_vtx_vy", &m_truth_vtx_vy);
+    m_outputTree_Truth->Branch("truth_vtx_vz", &m_truth_vtx_vz);
 
-    m_outputTree_Truth->Branch("d0", &m_d0);
-    m_outputTree_Truth->Branch("z0", &m_z0);
-    m_outputTree_Truth->Branch("phi", &m_phi);
-    m_outputTree_Truth->Branch("theta", &m_theta);
-    m_outputTree_Truth->Branch("qp", &m_qp);
-    m_outputTree_Truth->Branch("time", &m_time);
-    m_outputTree_Truth->Branch("vtxID", &m_vtxID);
+    m_outputTree_Truth->Branch("truth_vtx_trk_d0", &m_truth_vtx_trk_d0);
+    m_outputTree_Truth->Branch("truth_vtx_trk_z0", &m_truth_vtx_trk_z0);
+    m_outputTree_Truth->Branch("truth_vtx_trk_phi", &m_truth_vtx_trk_phi);
+    m_outputTree_Truth->Branch("truth_vtx_trk_theta", &m_truth_vtx_trk_theta);
+    m_outputTree_Truth->Branch("truth_vtx_trk_qp", &m_truth_vtx_trk_qp);
+    m_outputTree_Truth->Branch("truth_vtx_trk_time", &m_truth_vtx_trk_time);
+    m_outputTree_Truth->Branch("truth_vtx_trk_vtxID", &m_truth_vtx_trk_vtxID);
   }
 }
 
@@ -110,6 +110,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::endRun() {
   if (m_outputFile) {
     m_outputFile->cd();
     m_outputTree->Write();
+    m_outputTree_Truth->Write();
   }
   return ProcessCode::SUCCESS;
 }
@@ -144,6 +145,62 @@ int ActsExamples::RootVertexPerformanceWriter::
   return reconstructableTruthVertices.size();
 }
 
+std::vector<PV > ActsExamples::RootVertexPerformanceWriter::
+    getTruthVerticesVec(
+        const SimParticleContainer& collection) {
+  // map for finding frequency
+  std::vector<PV > PV_list;
+  
+  int r = (*collection.rbegin()).particleId().vertexPrimary();
+  PV_list.resize(r+1); 
+  
+  auto it = collection.cbegin();
+  int i = 0;
+
+  while (it != collection.cend()) // while it hasn't reach the end
+	{
+    int secVtxId = (*it).particleId().vertexSecondary();
+    if (secVtxId == 0) {
+      // truthparticle from primary vtx
+      int priVtxId = (*it).particleId().vertexPrimary();
+      PV_list[priVtxId].PV_loc[0] = (*it).position()[0];
+      PV_list[priVtxId].PV_loc[1] = (*it).position()[1];
+      PV_list[priVtxId].PV_loc[2] = (*it).position()[2];
+      PV_list[priVtxId].track_ID.push_back(i);
+    }
+		++it; // and iterate to the next element
+    ++i; 
+	}
+
+  return PV_list;
+}
+
+void ActsExamples::RootVertexPerformanceWriter::
+    writeTruthInfo( const TrackParametersContainer& inputFittedTracks,  std::vector<PV > PV_list) {
+
+  for(size_t i=0; i< PV_list.size(); ++i){
+    // std::cout<< "i= " << i  << std::endl;
+    if(PV_list[i].track_ID.size()>2){
+      m_truth_vtx_vx.push_back(PV_list[i].PV_loc[0]);
+      m_truth_vtx_vy.push_back(PV_list[i].PV_loc[1]);
+      m_truth_vtx_vz.push_back(PV_list[i].PV_loc[2]);
+
+      for(size_t j=0; j<PV_list[i].track_ID.size(); ++j){
+      // std::cout<< PV_list[i].track_ID[j] << " ";  
+      m_truth_vtx_trk_d0.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundLoc0]); 
+      m_truth_vtx_trk_z0.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundLoc1]); 
+      m_truth_vtx_trk_phi.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundPhi]); 
+      m_truth_vtx_trk_theta.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundTheta]); 
+      m_truth_vtx_trk_qp.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundQOverP]); 
+      m_truth_vtx_trk_time.push_back(inputFittedTracks[PV_list[i].track_ID[j]].parameters()[Acts::eBoundTime]); 
+      m_truth_vtx_trk_vtxID.push_back(m_truth_vtx_vx.size()-1); 
+      }
+    }
+	}
+
+}
+
+
 int ActsExamples::RootVertexPerformanceWriter::getNumberOfTruePriVertices(
     const SimParticleContainer& collection) const {
   // Vector to store indices of all primary vertices
@@ -167,7 +224,8 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     const std::vector<Acts::Vertex<Acts::BoundTrackParameters>>& vertices) {
   // Exclusive access to the tree while writing
   std::lock_guard<std::mutex> lock(m_writeMutex);
-
+  // Event Number 
+  m_eventNr = ctx.eventNumber;
   m_nrecoVtx = vertices.size();
 
   ACTS_DEBUG("Number of reco vertices in event: " << m_nrecoVtx);
@@ -204,6 +262,17 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
   m_nVtxReconstructable =
       getNumberOfReconstructableVertices(associatedTruthParticles);
 
+  std::vector<PV > PV_list = getTruthVerticesVec(associatedTruthParticles);
+  // for(size_t i=0; i< PV_list.size(); ++i){
+  //   std::cout<< "i= " << i  << std::endl;
+  //   for(size_t j=0; j<PV_list[i].track_ID.size(); ++j){
+  //     std::cout<< PV_list[i].track_ID[j] << " ";  
+  //   }
+  //   std::cout<< "\n" << std::endl;
+  // }
+
+
+
   ACTS_INFO("Total number of reco track-associated truth particles in event : "
             << associatedTruthParticles.size());
   ACTS_INFO("Total number of reco track-associated truth primary vertices : "
@@ -223,16 +292,25 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
         "Not able to match fitted tracks at reconstructed vertex to truth "
         "vertex.");
   } else {
-    auto it = associatedTruthParticles.begin();
-    for (size_t i = 0; i < associatedTruthParticles.size(); i++)
-    {
-      std::cout<< i << "-th:" << "Associated truth particle z:" << (*it).position()[2] << ", input fitted track z0:" << inputFittedTracks[i].parameters()[1] << std::endl;
-      if (it!=associatedTruthParticles.end())
-      {
-        ++it;
-      }
-    }
+
+    // auto it_assoTruthp = associatedTruthParticles.begin();
+    // for (size_t i = 0; i < associatedTruthParticles.size(); i++)
+    // {
+    //   std::cout<< i << "-th:" << "Associated truth particle "
+    //   << "  paricleId:" << (*it_assoTruthp).particleId() 
+    //   << "  vertexPrimary:" <<(*it_assoTruthp).particleId().vertexPrimary() 
+    //   << "  vertexSecondary:" << (*it_assoTruthp).particleId().vertexSecondary()
+    //   << "  x:" << (*it_assoTruthp).position()[0] 
+    //   << "  y:" << (*it_assoTruthp).position()[1] 
+    //   << "  z:" << (*it_assoTruthp).position()[2] << std::endl;
+    //   // << ", input fitted track z0:" << inputFittedTracks[i].parameters()[1] << std::endl;
+    //   if (it_assoTruthp!=associatedTruthParticles.end())
+    //   {
+    //     ++it_assoTruthp;
+    //   }
+    // }
     
+    writeTruthInfo(inputFittedTracks, PV_list);
     // Loop over all reco vertices and find associated truth particles
     std::vector<SimParticleContainer> truthParticlesAtVtxContainer;
     for (const auto& vtx : vertices) {
@@ -302,10 +380,23 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
 
   // fill the variables
   m_outputTree->Fill();
+  m_outputTree_Truth->Fill();
 
   m_diffx.clear();
   m_diffy.clear();
   m_diffz.clear();
+
+  m_truth_vtx_vx.clear();
+  m_truth_vtx_vy.clear();
+  m_truth_vtx_vz.clear();
+
+  m_truth_vtx_trk_d0.clear(); 
+  m_truth_vtx_trk_z0.clear(); 
+  m_truth_vtx_trk_phi.clear(); 
+  m_truth_vtx_trk_theta.clear(); 
+  m_truth_vtx_trk_qp.clear(); 
+  m_truth_vtx_trk_time.clear(); 
+  m_truth_vtx_trk_vtxID.clear(); 
 
   return ProcessCode::SUCCESS;
 }
