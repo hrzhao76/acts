@@ -113,21 +113,21 @@ class RootVertexPerformanceWriter final
   std::vector<double> m_truth_vtx_vz;
 
   /// The track parameter associated to the vtx 
-  std::vector<double> m_truth_vtx_trk_d0;
-  std::vector<double> m_truth_vtx_trk_z0;
-  std::vector<double> m_truth_vtx_trk_phi;
-  std::vector<double> m_truth_vtx_trk_theta;
-  std::vector<double> m_truth_vtx_trk_qp;
-  std::vector<double> m_truth_vtx_trk_time;
+  std::vector<double> m_truth_vtx_fitted_trk_d0;
+  std::vector<double> m_truth_vtx_fitted_trk_z0;
+  std::vector<double> m_truth_vtx_fitted_trk_phi;
+  std::vector<double> m_truth_vtx_fitted_trk_theta;
+  std::vector<double> m_truth_vtx_fitted_trk_qp;
+  std::vector<double> m_truth_vtx_fitted_trk_time;
 
-  std::vector<double> m_truth_vtx_trk_err_d0;
-  std::vector<double> m_truth_vtx_trk_err_z0;
-  std::vector<double> m_truth_vtx_trk_err_phi;
-  std::vector<double> m_truth_vtx_trk_err_theta;
-  std::vector<double> m_truth_vtx_trk_err_qp;
-  std::vector<double> m_truth_vtx_trk_err_time;
+  std::vector<double> m_truth_vtx_fitted_trk_err_d0;
+  std::vector<double> m_truth_vtx_fitted_trk_err_z0;
+  std::vector<double> m_truth_vtx_fitted_trk_err_phi;
+  std::vector<double> m_truth_vtx_fitted_trk_err_theta;
+  std::vector<double> m_truth_vtx_fitted_trk_err_qp;
+  std::vector<double> m_truth_vtx_fitted_trk_err_time;
 
-  std::vector<int> m_truth_vtx_trk_vtxID;
+  std::vector<int> m_truth_vtx_fitted_trk_vtxID;
 
   int getNumberOfReconstructableVertices(
       const SimParticleContainer& collection) const;

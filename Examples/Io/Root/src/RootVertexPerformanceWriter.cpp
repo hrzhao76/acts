@@ -90,20 +90,20 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
     m_outputTree_Truth->Branch("truth_vtx_vy", &m_truth_vtx_vy);
     m_outputTree_Truth->Branch("truth_vtx_vz", &m_truth_vtx_vz);
 
-    m_outputTree_Truth->Branch("truth_vtx_trk_d0", &m_truth_vtx_trk_d0);
-    m_outputTree_Truth->Branch("truth_vtx_trk_z0", &m_truth_vtx_trk_z0);
-    m_outputTree_Truth->Branch("truth_vtx_trk_phi", &m_truth_vtx_trk_phi);
-    m_outputTree_Truth->Branch("truth_vtx_trk_theta", &m_truth_vtx_trk_theta);
-    m_outputTree_Truth->Branch("truth_vtx_trk_qp", &m_truth_vtx_trk_qp);
-    m_outputTree_Truth->Branch("truth_vtx_trk_time", &m_truth_vtx_trk_time);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_d0", &m_truth_vtx_fitted_trk_d0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_z0", &m_truth_vtx_fitted_trk_z0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_phi", &m_truth_vtx_fitted_trk_phi);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_theta", &m_truth_vtx_fitted_trk_theta);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_qp", &m_truth_vtx_fitted_trk_qp);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_time", &m_truth_vtx_fitted_trk_time);
 
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_d0", &m_truth_vtx_trk_err_d0);
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_z0", &m_truth_vtx_trk_err_z0);
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_phi", &m_truth_vtx_trk_err_phi);
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_theta", &m_truth_vtx_trk_err_theta);
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_qp", &m_truth_vtx_trk_err_qp);
-    m_outputTree_Truth->Branch("truth_vtx_trk_err_time", &m_truth_vtx_trk_err_time);
-    m_outputTree_Truth->Branch("truth_vtx_trk_vtxID", &m_truth_vtx_trk_vtxID);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_d0", &m_truth_vtx_fitted_trk_err_d0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_z0", &m_truth_vtx_fitted_trk_err_z0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_phi", &m_truth_vtx_fitted_trk_err_phi);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_theta", &m_truth_vtx_fitted_trk_err_theta);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_qp", &m_truth_vtx_fitted_trk_err_qp);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_time", &m_truth_vtx_fitted_trk_err_time);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_vtxID", &m_truth_vtx_fitted_trk_vtxID);
   }
 }
 
@@ -192,40 +192,44 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
       m_truth_vtx_vz.push_back(PV_list[i].PV_loc[2]);
 
       for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
+
+
+
+
         const auto& boundParam = inputFittedTracks[PV_list[i].track_ID[j]];
         const auto& parameter = boundParam.parameters();
 
-        m_truth_vtx_trk_d0.push_back(parameter[Acts::eBoundLoc0]);
-        m_truth_vtx_trk_z0.push_back(parameter[Acts::eBoundLoc1]);
-        m_truth_vtx_trk_phi.push_back(parameter[Acts::eBoundPhi]);
-        m_truth_vtx_trk_theta.push_back(parameter[Acts::eBoundTheta]);
-        m_truth_vtx_trk_qp.push_back(parameter[Acts::eBoundQOverP]);
-        m_truth_vtx_trk_time.push_back(parameter[Acts::eBoundTime]);
+        m_truth_vtx_fitted_trk_d0.push_back(parameter[Acts::eBoundLoc0]);
+        m_truth_vtx_fitted_trk_z0.push_back(parameter[Acts::eBoundLoc1]);
+        m_truth_vtx_fitted_trk_phi.push_back(parameter[Acts::eBoundPhi]);
+        m_truth_vtx_fitted_trk_theta.push_back(parameter[Acts::eBoundTheta]);
+        m_truth_vtx_fitted_trk_qp.push_back(parameter[Acts::eBoundQOverP]);
+        m_truth_vtx_fitted_trk_time.push_back(parameter[Acts::eBoundTime]);
 
 
         if (boundParam.covariance().has_value()) {
           const auto& covariance = *boundParam.covariance();
-          m_truth_vtx_trk_err_d0.push_back(
+          m_truth_vtx_fitted_trk_err_d0.push_back(
               sqrt(covariance(Acts::eBoundLoc0, Acts::eBoundLoc0)));
-          m_truth_vtx_trk_err_z0.push_back(
+          m_truth_vtx_fitted_trk_err_z0.push_back(
               sqrt(covariance(Acts::eBoundLoc1, Acts::eBoundLoc1)));
-          m_truth_vtx_trk_err_phi.push_back(
+          m_truth_vtx_fitted_trk_err_phi.push_back(
               sqrt(covariance(Acts::eBoundPhi, Acts::eBoundPhi)));
-          m_truth_vtx_trk_err_theta.push_back(
+          m_truth_vtx_fitted_trk_err_theta.push_back(
               sqrt(covariance(Acts::eBoundTheta, Acts::eBoundTheta)));
-          m_truth_vtx_trk_err_qp.push_back(
+          m_truth_vtx_fitted_trk_err_qp.push_back(
               sqrt(covariance(Acts::eBoundQOverP, Acts::eBoundQOverP)));
-          m_truth_vtx_trk_err_time.push_back(
+          m_truth_vtx_fitted_trk_err_time.push_back(
               sqrt(covariance(Acts::eBoundTime, Acts::eBoundTime)));
         } else {
-          m_truth_vtx_trk_err_d0.push_back(NaNfloat);
-          m_truth_vtx_trk_err_z0.push_back(NaNfloat);
-          m_truth_vtx_trk_err_phi.push_back(NaNfloat);
-          m_truth_vtx_trk_err_theta.push_back(NaNfloat);
-          m_truth_vtx_trk_err_qp.push_back(NaNfloat);
-          m_truth_vtx_trk_err_time.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_d0.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_z0.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_phi.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_theta.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_qp.push_back(NaNfloat);
+          m_truth_vtx_fitted_trk_err_time.push_back(NaNfloat);
         }
-        m_truth_vtx_trk_vtxID.push_back(m_truth_vtx_vx.size() - 1);
+        m_truth_vtx_fitted_trk_vtxID.push_back(m_truth_vtx_vx.size() - 1);
       }
     }
   }
@@ -395,20 +399,20 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
   m_truth_vtx_vy.clear();
   m_truth_vtx_vz.clear();
 
-  m_truth_vtx_trk_d0.clear(); 
-  m_truth_vtx_trk_z0.clear(); 
-  m_truth_vtx_trk_phi.clear(); 
-  m_truth_vtx_trk_theta.clear(); 
-  m_truth_vtx_trk_qp.clear(); 
-  m_truth_vtx_trk_time.clear(); 
-  m_truth_vtx_trk_vtxID.clear(); 
+  m_truth_vtx_fitted_trk_d0.clear(); 
+  m_truth_vtx_fitted_trk_z0.clear(); 
+  m_truth_vtx_fitted_trk_phi.clear(); 
+  m_truth_vtx_fitted_trk_theta.clear(); 
+  m_truth_vtx_fitted_trk_qp.clear(); 
+  m_truth_vtx_fitted_trk_time.clear(); 
+  m_truth_vtx_fitted_trk_vtxID.clear(); 
 
-  m_truth_vtx_trk_err_d0.clear(); 
-  m_truth_vtx_trk_err_z0.clear(); 
-  m_truth_vtx_trk_err_phi.clear(); 
-  m_truth_vtx_trk_err_theta.clear(); 
-  m_truth_vtx_trk_err_qp.clear(); 
-  m_truth_vtx_trk_err_time.clear(); 
+  m_truth_vtx_fitted_trk_err_d0.clear(); 
+  m_truth_vtx_fitted_trk_err_z0.clear(); 
+  m_truth_vtx_fitted_trk_err_phi.clear(); 
+  m_truth_vtx_fitted_trk_err_theta.clear(); 
+  m_truth_vtx_fitted_trk_err_qp.clear(); 
+  m_truth_vtx_fitted_trk_err_time.clear(); 
 
   return ProcessCode::SUCCESS;
 }
