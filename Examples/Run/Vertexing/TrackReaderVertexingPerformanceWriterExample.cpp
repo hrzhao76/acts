@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 
   RootParticleReader::Config particleReaderConfig;
   particleReaderConfig.particleCollection = "allTruthParticles";
-  particleReaderConfig.inputFile = "particles_initial.root";
+  particleReaderConfig.inputFile = "particles.root";
   particleReaderConfig.treeName = "particles";
   particleReaderConfig.inputDir = inputDir;
   sequencer.addReader(
