@@ -12,6 +12,7 @@
 #include "ActsExamples/EventData/Trajectories.hpp"
 #include "ActsExamples/Framework/WriterT.hpp"
 
+
 #include <mutex>
 #include <vector>
 
@@ -108,6 +109,14 @@ class RootTrajectoryParametersWriter final
       m_t_pT;  ///< Initial momenta pT of all truth particle in event
   std::vector<float>
       m_t_eta;  ///< Initial momenta eta of all truth particle in event
+  /// Add more 
+  std::vector<int32_t> m_t_particleType;
+  std::vector<uint32_t> m_t_process;
+  std::vector<float> m_t_vt;
+  std::vector<float> m_t_p;
+  std::vector<float> m_t_m;
+  std::vector<float> m_t_q;
+
 
   std::vector<bool> m_hasFittedParams;  ///< Ff the track has fitted parameter
   std::vector<float>

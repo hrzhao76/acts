@@ -435,22 +435,25 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     writeTruthInfo(PV_list,  associatedTruthParticles, inputFittedTracks);
     // writeRecoInfo(vertices);
 
-    auto it_assoTruthp = associatedTruthParticles.begin();
-    for (size_t i = 0; i < associatedTruthParticles.size(); i++)
-    {
-      std::cout<< i << "-th:" << "Associated truth particle "
-      << "  paricleId:" << (*it_assoTruthp).particleId() 
-      << "  vertexPrimary:" <<(*it_assoTruthp).particleId().vertexPrimary() 
-      << "  vertexSecondary:" << (*it_assoTruthp).particleId().vertexSecondary()
-      << "  x:" << (*it_assoTruthp).position()[0] 
-      << "  y:" << (*it_assoTruthp).position()[1] 
-      << "  z:" << (*it_assoTruthp).position()[2] << std::endl;
-      // << ", input fitted track z0:" << inputFittedTracks[i].parameters()[1] << std::endl;
-      if (it_assoTruthp!=associatedTruthParticles.end())
-      {
-        ++it_assoTruthp;
-      }
-    }
+    // auto it_assoTruthp = associatedTruthParticles.begin();
+    // for (size_t i = 0; i < associatedTruthParticles.size(); i++)
+    // {
+    //   std::cout<< i << "-th:" << "Associated truth particle "
+    //   << "  paricleId:" << (*it_assoTruthp).particleId() 
+    //   // << "  vertexPrimary:" <<(*it_assoTruthp).particleId().vertexPrimary() 
+    //   // << "  vertexSecondary:" << (*it_assoTruthp).particleId().vertexSecondary()
+    //   << "  x:" << (*it_assoTruthp).position()[0] 
+    //   << "  y:" << (*it_assoTruthp).position()[1] 
+    //   << "  z:" << (*it_assoTruthp).position()[2] 
+    //   << "  pt:" << (*it_assoTruthp).transverseMomentum()
+    //   << "  px:" << (*it_assoTruthp).fourMomentum()[0] 
+    //   << std::endl;
+    //   // << ", input fitted track z0:" << inputFittedTracks[i].parameters()[1] << std::endl;
+    //   if (it_assoTruthp!=associatedTruthParticles.end())
+    //   {
+    //     ++it_assoTruthp;
+    //   }
+    // }
     // Loop over all reco vertices and find associated truth particles
     std::vector<SimParticleContainer> truthParticlesAtVtxContainer;
     for (const auto& vtx : vertices) {

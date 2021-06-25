@@ -13,6 +13,7 @@
 #include "ActsExamples/EventData/SimParticle.hpp"
 #include "ActsExamples/Framework/WhiteBoard.hpp"
 #include "ActsExamples/Utilities/Paths.hpp"
+#include "ActsFatras/EventData/ProcessType.hpp"
 
 #include <iostream>
 
@@ -49,6 +50,14 @@ ActsExamples::RootTrajectoryParametersReader::RootTrajectoryParametersReader(
   m_inputChain->SetBranchAddress("t_phi", &m_t_phi);
   m_inputChain->SetBranchAddress("t_eta", &m_t_eta);
   m_inputChain->SetBranchAddress("t_pT", &m_t_pT);
+
+  //Added 
+  m_inputChain->SetBranchAddress("t_particleType", &m_t_particleType);
+  m_inputChain->SetBranchAddress("t_process", &m_t_process);
+  m_inputChain->SetBranchAddress("t_vt", &m_t_vt);
+  m_inputChain->SetBranchAddress("t_p", &m_t_p);
+  m_inputChain->SetBranchAddress("t_m", &m_t_m);
+  m_inputChain->SetBranchAddress("t_q", &m_t_q);
 
   m_inputChain->SetBranchAddress("hasFittedParams", &m_hasFittedParams);
   m_inputChain->SetBranchAddress("eLOC0_fit", &m_eLOC0_fit);
@@ -109,6 +118,14 @@ ActsExamples::RootTrajectoryParametersReader::
   delete m_t_phi;
   delete m_t_pT;
   delete m_t_eta;
+  // Added 
+  delete m_t_particleType;
+  delete m_t_process;
+  delete m_t_vt;
+  delete m_t_p;
+  delete m_t_m;
+  delete m_t_q;
+  
   delete m_hasFittedParams;
   delete m_eLOC0_fit;
   delete m_eLOC1_fit;
@@ -178,13 +195,20 @@ ActsExamples::ProcessCode ActsExamples::RootTrajectoryParametersReader::read(
     }
 
     unsigned int nTruthParticles = m_t_vx->size();
+    ACTS_INFO("nTruthParticles Size " << nTruthParticles << entry);
     for (unsigned int i = 0; i < nTruthParticles; i++) {
-      ActsFatras::Particle truthParticle;
-
+      Acts::PdgParticle pdg = static_cast<Acts::PdgParticle>((*m_t_particleType)[i]);
+      ActsFatras::Particle truthParticle((*m_t_barcode)[i], pdg, (*m_t_q)[i], (*m_t_m)[i]);
       truthParticle.setPosition4((*m_t_vx)[i], (*m_t_vy)[i], (*m_t_vz)[i],
                                  (*m_t_time)[i]);
       truthParticle.setDirection((*m_t_px)[i], (*m_t_py)[i], (*m_t_pz)[i]);
       truthParticle.setParticleId((*m_t_barcode)[i]);
+
+      // Added 
+      // ProcessType processtype = static_cast<ProcessType>((*m_t_particleType)[i]);
+      // truthParticle.setProcess(processtype);
+      truthParticle.setAbsoluteMomentum((*m_t_p)[i]);
+      truthParticle.setCharge((*m_t_q)[i]);
 
       truthParticleCollection.insert(truthParticleCollection.end(),
                                      truthParticle);

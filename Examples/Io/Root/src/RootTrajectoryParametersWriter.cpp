@@ -84,6 +84,14 @@ ActsExamples::RootTrajectoryParametersWriter::RootTrajectoryParametersWriter(
     m_outputTree->Branch("t_phi", &m_t_phi);
     m_outputTree->Branch("t_eta", &m_t_eta);
     m_outputTree->Branch("t_pT", &m_t_pT);
+    // Added 
+    m_outputTree->Branch("t_particleType", &m_t_particleType);
+    m_outputTree->Branch("t_process", &m_t_process);
+    m_outputTree->Branch("t_vt", &m_t_vt);
+    m_outputTree->Branch("t_p", &m_t_p);
+    m_outputTree->Branch("t_m", &m_t_m);
+    m_outputTree->Branch("t_q", &m_t_q);
+
 
     m_outputTree->Branch("hasFittedParams", &m_hasFittedParams);
     m_outputTree->Branch("eLOC0_fit", &m_eLOC0_fit);
@@ -191,6 +199,16 @@ ActsExamples::ProcessCode ActsExamples::RootTrajectoryParametersWriter::writeT(
           m_t_phi.push_back(phi(particle.unitDirection()));
           m_t_eta.push_back(eta(particle.unitDirection()));
           m_t_pT.push_back(p * perp(particle.unitDirection()));
+
+          // Added 
+          m_t_particleType.push_back(particle.pdg());
+          m_t_process.push_back(static_cast<uint32_t>(particle.process()));
+          m_t_vt.push_back(particle.fourPosition().w() / Acts::UnitConstants::ns);
+          m_t_p.push_back(p);
+          m_t_m.push_back(particle.mass() / Acts::UnitConstants::GeV);
+          m_t_q.push_back(particle.charge() / Acts::UnitConstants::e);
+          
+
         } else {
           ACTS_WARNING("Truth particle with barcode = " << barcode
                                                         << " not found!");
@@ -257,6 +275,15 @@ ActsExamples::ProcessCode ActsExamples::RootTrajectoryParametersWriter::writeT(
   m_t_phi.clear();
   m_t_pT.clear();
   m_t_eta.clear();
+  
+  // Added
+  m_t_particleType.clear();
+  m_t_process.clear();
+  m_t_vt.clear();
+  m_t_p.clear();
+  m_t_m.clear();
+  m_t_q.clear();
+
   m_hasFittedParams.clear();
   m_eLOC0_fit.clear();
   m_eLOC1_fit.clear();

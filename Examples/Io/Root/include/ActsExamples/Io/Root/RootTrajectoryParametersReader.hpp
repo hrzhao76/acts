@@ -126,6 +126,14 @@ class RootTrajectoryParametersReader : public IReader {
       new std::vector<float>;  ///< Truth particle initial momentum pT
   std::vector<float>* m_t_eta =
       new std::vector<float>;  ///< Truth particle initial momentum eta
+  /// Add more 
+  std::vector<int32_t>* m_t_particleType = new std::vector<int32_t>;
+  std::vector<uint32_t>* m_t_process = new std::vector<uint32_t>;
+  std::vector<float>* m_t_vt = new std::vector<float>;
+  std::vector<float>* m_t_p = new std::vector<float>;
+  std::vector<float>* m_t_m = new std::vector<float>;
+  std::vector<float>* m_t_q = new std::vector<float>;
+
 
   std::vector<bool>* m_hasFittedParams =
       new std::vector<bool>;  ///< if the track has fitted parameter
