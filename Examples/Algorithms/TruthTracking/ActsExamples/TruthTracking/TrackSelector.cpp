@@ -34,6 +34,7 @@ ActsExamples::ProcessCode ActsExamples::TrackSelector::execute(
     const ActsExamples::AlgorithmContext& ctx) const {
   // helper functions to select tracks
   auto within = [](double x, double min, double max) {
+    std::cout << x << std::endl;
     return (min <= x) and (x < max);
   };
   auto isValidTrack = [&](const auto& trk) {
@@ -75,6 +76,24 @@ ActsExamples::ProcessCode ActsExamples::TrackSelector::execute(
   }
   outputTrackParameters.shrink_to_fit();
   outputTrackIndices.shrink_to_fit();
+
+  std::cout << "Output from Track Selector Read out" << std::endl;
+
+  for (auto i = outputTrackIndices.begin(); i != outputTrackIndices.end(); ++i)
+    std::cout << *i << ' ';
+  std::cout << '\n' << std::endl;
+
+  std::cout << "Directly from track parameters" << std::endl;
+  for (int i = 0; i < 200; ++i)
+    std::cout << outputTrackParameters[i].parameters()[Acts::eBoundLoc0] << ' ';
+  std::cout << '\n' << std::endl;
+
+  std::cout << "Indirectly from track indices" << std::endl;
+  for (int i = 0; i < 200; ++i)
+    std::cout << inputTrackParameters[outputTrackIndices[i]]
+                     .parameters()[Acts::eBoundLoc0]
+              << ' ';
+  std::cout << '\n' << std::endl;
 
   ACTS_DEBUG("event " << ctx.eventNumber << " selected "
                       << outputTrackParameters.size() << " from "

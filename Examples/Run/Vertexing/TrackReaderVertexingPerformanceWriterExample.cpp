@@ -113,6 +113,9 @@ int main(int argc, char* argv[]) {
   vertexWriterConfig.inputFittedTracks = trackParamsReader.outputTracks;
   vertexWriterConfig.inputVertices = findVertices.outputVertices;
   vertexWriterConfig.inputTime = findVertices.outputTime;
+  vertexWriterConfig.inputPVSelectedTrackIndices =
+      trackSelectorConfig.outputTrackIndices;
+
   vertexWriterConfig.outputFilename = "vertexperformance_AMVF.root";
   vertexWriterConfig.outputTreename = "amvf";
   vertexWriterConfig.outputDir = outputDir;

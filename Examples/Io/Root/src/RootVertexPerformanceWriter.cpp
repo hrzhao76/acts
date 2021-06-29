@@ -63,6 +63,10 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
   if (m_cfg.inputTime.empty()) {
     throw std::invalid_argument("Input reconstruction time missing");
   }
+  if (m_cfg.inputPVSelectedTrackIndices.empty()) {
+    throw std::invalid_argument(
+        "Input primary vertexing selected track indices missing");
+  }
 
   // Setup ROOT I/O
   if (m_outputFile == nullptr) {
@@ -75,10 +79,10 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
   m_outputFile->cd();
   m_outputTree =
       new TTree(m_cfg.outputTreename.c_str(), m_cfg.outputTreename.c_str());
-  m_outputTree_Truth = 
-      new TTree(m_cfg.outputTreename_Truth.c_str(), m_cfg.outputTreename_Truth.c_str());
-  m_outputTree_Reco = 
-      new TTree(m_cfg.outputTreename_Reco.c_str(), m_cfg.outputTreename_Reco.c_str());
+  m_outputTree_Truth = new TTree(m_cfg.outputTreename_Truth.c_str(),
+                                 m_cfg.outputTreename_Truth.c_str());
+  m_outputTree_Reco = new TTree(m_cfg.outputTreename_Reco.c_str(),
+                                m_cfg.outputTreename_Reco.c_str());
 
   if (m_outputTree == nullptr)
     throw std::bad_alloc();
@@ -100,7 +104,8 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
 
     m_outputTree_Truth->Branch("truth_particle_Id", &m_truth_particle_Id);
     m_outputTree_Truth->Branch("truth_particle_Type", &m_truth_particle_Type);
-    m_outputTree_Truth->Branch("truth_particle_process", &m_truth_particle_process);
+    m_outputTree_Truth->Branch("truth_particle_process",
+                               &m_truth_particle_process);
     m_outputTree_Truth->Branch("truth_particle_vx", &m_truth_particle_vx);
     m_outputTree_Truth->Branch("truth_particle_vy", &m_truth_particle_vy);
     m_outputTree_Truth->Branch("truth_particle_vz", &m_truth_particle_vz);
@@ -114,62 +119,97 @@ ActsExamples::RootVertexPerformanceWriter::RootVertexPerformanceWriter(
     m_outputTree_Truth->Branch("truth_particle_eta", &m_truth_particle_eta);
     m_outputTree_Truth->Branch("truth_particle_phi", &m_truth_particle_phi);
     m_outputTree_Truth->Branch("truth_particle_pt", &m_truth_particle_pt);
-    m_outputTree_Truth->Branch("truth_particle_vertexPrimary", &m_truth_particle_vertexPrimary);
-    m_outputTree_Truth->Branch("truth_particle_vertexSecondary", &m_truth_particle_vertexSecondary);
-    m_outputTree_Truth->Branch("truth_particle_particle", &m_truth_particle_particle);
-    m_outputTree_Truth->Branch("truth_particle_generation", &m_truth_particle_generation);
-    m_outputTree_Truth->Branch("truth_particle_subParticle", &m_truth_particle_subParticle);
+    m_outputTree_Truth->Branch("truth_particle_vertexPrimary",
+                               &m_truth_particle_vertexPrimary);
+    m_outputTree_Truth->Branch("truth_particle_vertexSecondary",
+                               &m_truth_particle_vertexSecondary);
+    m_outputTree_Truth->Branch("truth_particle_particle",
+                               &m_truth_particle_particle);
+    m_outputTree_Truth->Branch("truth_particle_generation",
+                               &m_truth_particle_generation);
+    m_outputTree_Truth->Branch("truth_particle_subParticle",
+                               &m_truth_particle_subParticle);
 
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_d0", &m_truth_vtx_fitted_trk_d0);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_z0", &m_truth_vtx_fitted_trk_z0);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_phi", &m_truth_vtx_fitted_trk_phi);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_theta", &m_truth_vtx_fitted_trk_theta);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_qp", &m_truth_vtx_fitted_trk_qp);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_time", &m_truth_vtx_fitted_trk_time);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_d0",
+                               &m_truth_vtx_fitted_trk_d0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_z0",
+                               &m_truth_vtx_fitted_trk_z0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_phi",
+                               &m_truth_vtx_fitted_trk_phi);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_theta",
+                               &m_truth_vtx_fitted_trk_theta);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_qp",
+                               &m_truth_vtx_fitted_trk_qp);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_time",
+                               &m_truth_vtx_fitted_trk_time);
 
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_d0", &m_truth_vtx_fitted_trk_err_d0);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_z0", &m_truth_vtx_fitted_trk_err_z0);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_phi", &m_truth_vtx_fitted_trk_err_phi);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_theta", &m_truth_vtx_fitted_trk_err_theta);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_qp", &m_truth_vtx_fitted_trk_err_qp);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_time", &m_truth_vtx_fitted_trk_err_time);
-    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_vtxID", &m_truth_vtx_fitted_trk_vtxID);
-
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_d0",
+                               &m_truth_vtx_fitted_trk_err_d0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_z0",
+                               &m_truth_vtx_fitted_trk_err_z0);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_phi",
+                               &m_truth_vtx_fitted_trk_err_phi);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_theta",
+                               &m_truth_vtx_fitted_trk_err_theta);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_qp",
+                               &m_truth_vtx_fitted_trk_err_qp);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_err_time",
+                               &m_truth_vtx_fitted_trk_err_time);
+    m_outputTree_Truth->Branch("truth_vtx_fitted_trk_vtxID",
+                               &m_truth_vtx_fitted_trk_vtxID);
 
     m_outputTree_Reco->Branch("event_id", &m_eventId);
-    m_outputTree_Reco->Branch("reco_vtx_vx",&m_reco_vtx_vx);
-    m_outputTree_Reco->Branch("reco_vtx_vy",&m_reco_vtx_vy);
-    m_outputTree_Reco->Branch("reco_vtx_vz",&m_reco_vtx_vz);
-    m_outputTree_Reco->Branch("reco_vtx_fitquality_chiSquared",&m_reco_vtx_fitquality_chiSquared);
-    m_outputTree_Reco->Branch("reco_vtx_fitquality_nDoF",&m_reco_vtx_fitquality_nDoF);
-    m_outputTree_Reco->Branch("reco_vtx_err_vx_vx",&m_reco_vtx_err_vx_vx);
-    m_outputTree_Reco->Branch("reco_vtx_err_vx_vy",&m_reco_vtx_err_vx_vy);
-    m_outputTree_Reco->Branch("reco_vtx_err_vx_vz",&m_reco_vtx_err_vx_vz);
-    m_outputTree_Reco->Branch("reco_vtx_err_vy_vy",&m_reco_vtx_err_vy_vy);
-    m_outputTree_Reco->Branch("reco_vtx_err_vy_vz",&m_reco_vtx_err_vy_vz);
-    m_outputTree_Reco->Branch("reco_vtx_err_vz_vz",&m_reco_vtx_err_vz_vz);
+    m_outputTree_Reco->Branch("reco_vtx_vx", &m_reco_vtx_vx);
+    m_outputTree_Reco->Branch("reco_vtx_vy", &m_reco_vtx_vy);
+    m_outputTree_Reco->Branch("reco_vtx_vz", &m_reco_vtx_vz);
+    m_outputTree_Reco->Branch("reco_vtx_fitquality_chiSquared",
+                              &m_reco_vtx_fitquality_chiSquared);
+    m_outputTree_Reco->Branch("reco_vtx_fitquality_nDoF",
+                              &m_reco_vtx_fitquality_nDoF);
+    m_outputTree_Reco->Branch("reco_vtx_err_vx_vx", &m_reco_vtx_err_vx_vx);
+    m_outputTree_Reco->Branch("reco_vtx_err_vx_vy", &m_reco_vtx_err_vx_vy);
+    m_outputTree_Reco->Branch("reco_vtx_err_vx_vz", &m_reco_vtx_err_vx_vz);
+    m_outputTree_Reco->Branch("reco_vtx_err_vy_vy", &m_reco_vtx_err_vy_vy);
+    m_outputTree_Reco->Branch("reco_vtx_err_vy_vz", &m_reco_vtx_err_vy_vz);
+    m_outputTree_Reco->Branch("reco_vtx_err_vz_vz", &m_reco_vtx_err_vz_vz);
 
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_d0",&m_reco_vtx_fitted_trk_d0);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_z0",&m_reco_vtx_fitted_trk_z0);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_phi",&m_reco_vtx_fitted_trk_phi);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_theta",&m_reco_vtx_fitted_trk_theta);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_qp",&m_reco_vtx_fitted_trk_qp);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_time",&m_reco_vtx_fitted_trk_time);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_d0",
+                              &m_reco_vtx_fitted_trk_d0);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_z0",
+                              &m_reco_vtx_fitted_trk_z0);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_phi",
+                              &m_reco_vtx_fitted_trk_phi);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_theta",
+                              &m_reco_vtx_fitted_trk_theta);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_qp",
+                              &m_reco_vtx_fitted_trk_qp);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_time",
+                              &m_reco_vtx_fitted_trk_time);
 
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_d0", &m_reco_vtx_fitted_trk_err_d0);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_z0", &m_reco_vtx_fitted_trk_err_z0);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_phi", &m_reco_vtx_fitted_trk_err_phi);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_theta", &m_reco_vtx_fitted_trk_err_theta);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_qp", &m_reco_vtx_fitted_trk_err_qp);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_time", &m_reco_vtx_fitted_trk_err_time);
-    
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_chi2Track", &m_reco_vtx_fitted_trk_chi2Track);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_ndf", &m_reco_vtx_fitted_trk_ndf);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_vertexCompatibility", &m_reco_vtx_fitted_trk_vertexCompatibility);
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_trackWeight", &m_reco_vtx_fitted_trk_trackWeight);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_d0",
+                              &m_reco_vtx_fitted_trk_err_d0);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_z0",
+                              &m_reco_vtx_fitted_trk_err_z0);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_phi",
+                              &m_reco_vtx_fitted_trk_err_phi);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_theta",
+                              &m_reco_vtx_fitted_trk_err_theta);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_qp",
+                              &m_reco_vtx_fitted_trk_err_qp);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_err_time",
+                              &m_reco_vtx_fitted_trk_err_time);
 
-    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_vtxID", &m_reco_vtx_fitted_trk_vtxID);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_chi2Track",
+                              &m_reco_vtx_fitted_trk_chi2Track);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_ndf",
+                              &m_reco_vtx_fitted_trk_ndf);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_vertexCompatibility",
+                              &m_reco_vtx_fitted_trk_vertexCompatibility);
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_trackWeight",
+                              &m_reco_vtx_fitted_trk_trackWeight);
 
+    m_outputTree_Reco->Branch("reco_vtx_fitted_trk_vtxID",
+                              &m_reco_vtx_fitted_trk_vtxID);
   }
 }
 
@@ -219,47 +259,44 @@ int ActsExamples::RootVertexPerformanceWriter::
   return reconstructableTruthVertices.size();
 }
 
-std::vector<PV> ActsExamples::RootVertexPerformanceWriter::
-    getTruthVerticesVec(
-        const SimParticleContainer& collection) {
-  // map for finding frequency
-  std::vector<PV > PV_list;
-  
-  long unsigned int r = (*collection.rbegin()).particleId().vertexPrimary();
-  PV_list.resize(r); 
-  
-  auto it = collection.cbegin();
-  int idx_particle = 0;
+std::vector<PV> ActsExamples::RootVertexPerformanceWriter::getTruthVerticesVec(
+    const SimParticleContainer& collection,
+    std::vector<uint32_t> inputPVSelectedTrackIndices) {
+  std::vector<PV> PV_list;
 
-  for (long unsigned int i = 0; i < r; i++)
-  {
+  long unsigned int r = (*collection.rbegin()).particleId().vertexPrimary();
+  PV_list.resize(r);
+
+  auto it = collection.cbegin();
+  unsigned int idx_particle = 0;
+  int idx_track_selected = 0;
+
+  for (long unsigned int i = 0; i < r; i++) {
     PV_list[i].PV_loc[0] = (*it).position()[0];
     PV_list[i].PV_loc[1] = (*it).position()[1];
     PV_list[i].PV_loc[2] = (*it).position()[2];
 
-    while ((*it).particleId().vertexPrimary() == i+1 )
-    {
+    while ((*it).particleId().vertexPrimary() == i + 1) {
+      if (idx_particle != inputPVSelectedTrackIndices[idx_track_selected]) {
+        ++it;
+        ++idx_particle;
+        continue;
+      }
+
       PV_list[i].track_ID.push_back(idx_particle);
-      ++it;
-      ++idx_particle;
+      ++idx_track_selected;
     }
-    
   }
-  
+
   return PV_list;
 }
 
-
 void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
-    std::vector<PV> PV_list, 
-    const SimParticleContainer& collection, 
-    const TrackParametersContainer& inputFittedTracks
-    ) {
-
+    std::vector<PV> PV_list, const SimParticleContainer& collection,
+    const TrackParametersContainer& inputFittedTracks) {
   auto particle_it = collection.cbegin();
   for (size_t i = 0; i < PV_list.size(); ++i) {
     if (PV_list[i].track_ID.size() > 1) {
-
       m_truth_vtx_vx.push_back(PV_list[i].PV_loc[0]);
       m_truth_vtx_vy.push_back(PV_list[i].PV_loc[1]);
       m_truth_vtx_vz.push_back(PV_list[i].PV_loc[2]);
@@ -267,39 +304,57 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
         /* Copy from particle writer */
         m_truth_particle_Id.push_back((*particle_it).particleId().value());
         m_truth_particle_Type.push_back((*particle_it).pdg());
-        m_truth_particle_process.push_back(static_cast<uint32_t>((*particle_it).process()));
+        m_truth_particle_process.push_back(
+            static_cast<uint32_t>((*particle_it).process()));
         // position
-        m_truth_particle_vx.push_back((*particle_it).fourPosition().x() / Acts::UnitConstants::mm);
-        m_truth_particle_vy.push_back((*particle_it).fourPosition().y() / Acts::UnitConstants::mm);
-        m_truth_particle_vz.push_back((*particle_it).fourPosition().z() / Acts::UnitConstants::mm);
-        m_truth_particle_vt.push_back((*particle_it).fourPosition().w() / Acts::UnitConstants::ns);
+        m_truth_particle_vx.push_back((*particle_it).fourPosition().x() /
+                                      Acts::UnitConstants::mm);
+        m_truth_particle_vy.push_back((*particle_it).fourPosition().y() /
+                                      Acts::UnitConstants::mm);
+        m_truth_particle_vz.push_back((*particle_it).fourPosition().z() /
+                                      Acts::UnitConstants::mm);
+        m_truth_particle_vt.push_back((*particle_it).fourPosition().w() /
+                                      Acts::UnitConstants::ns);
         // momentum
-        const auto p = (*particle_it).absoluteMomentum() / Acts::UnitConstants::GeV;
+        const auto p =
+            (*particle_it).absoluteMomentum() / Acts::UnitConstants::GeV;
         m_truth_particle_p.push_back(p);
         m_truth_particle_px.push_back(p * (*particle_it).unitDirection().x());
         m_truth_particle_py.push_back(p * (*particle_it).unitDirection().y());
         m_truth_particle_pz.push_back(p * (*particle_it).unitDirection().z());
         // particle constants
-        m_truth_particle_m.push_back((*particle_it).mass() / Acts::UnitConstants::GeV);
-        m_truth_particle_q.push_back((*particle_it).charge() / Acts::UnitConstants::e);
+        m_truth_particle_m.push_back((*particle_it).mass() /
+                                     Acts::UnitConstants::GeV);
+        m_truth_particle_q.push_back((*particle_it).charge() /
+                                     Acts::UnitConstants::e);
         // derived kinematic quantities
-        m_truth_particle_eta.push_back(Acts::VectorHelpers::eta((*particle_it).unitDirection()));
-        m_truth_particle_phi.push_back(Acts::VectorHelpers::phi((*particle_it).unitDirection()));
-        m_truth_particle_pt.push_back(p * Acts::VectorHelpers::perp((*particle_it).unitDirection()));
+        m_truth_particle_eta.push_back(
+            Acts::VectorHelpers::eta((*particle_it).unitDirection()));
+        m_truth_particle_phi.push_back(
+            Acts::VectorHelpers::phi((*particle_it).unitDirection()));
+        m_truth_particle_pt.push_back(
+            p * Acts::VectorHelpers::perp((*particle_it).unitDirection()));
         // decoded barcode components
-        m_truth_particle_vertexPrimary.push_back((*particle_it).particleId().vertexPrimary());
-        m_truth_particle_vertexSecondary.push_back((*particle_it).particleId().vertexSecondary());
-        m_truth_particle_particle.push_back((*particle_it).particleId().particle());
-        m_truth_particle_generation.push_back((*particle_it).particleId().generation());
-        m_truth_particle_subParticle.push_back((*particle_it).particleId().subParticle());
+        m_truth_particle_vertexPrimary.push_back(
+            (*particle_it).particleId().vertexPrimary());
+        m_truth_particle_vertexSecondary.push_back(
+            (*particle_it).particleId().vertexSecondary());
+        m_truth_particle_particle.push_back(
+            (*particle_it).particleId().particle());
+        m_truth_particle_generation.push_back(
+            (*particle_it).particleId().generation());
+        m_truth_particle_subParticle.push_back(
+            (*particle_it).particleId().subParticle());
 
         ++particle_it;
       }
 
       for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
-
-        const auto& boundParam = inputFittedTracks[PV_list[i].track_ID[j]];
+        const auto& boundParam =
+            inputFittedTracks[PV_list[i].track_ID[j]];  // TODO - Check
         const auto& parameter = boundParam.parameters();
+
+        std::cout << parameter[Acts::eBoundLoc0] << ' ';
 
         m_truth_vtx_fitted_trk_d0.push_back(parameter[Acts::eBoundLoc0]);
         m_truth_vtx_fitted_trk_z0.push_back(parameter[Acts::eBoundLoc1]);
@@ -307,7 +362,6 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
         m_truth_vtx_fitted_trk_theta.push_back(parameter[Acts::eBoundTheta]);
         m_truth_vtx_fitted_trk_qp.push_back(parameter[Acts::eBoundQOverP]);
         m_truth_vtx_fitted_trk_time.push_back(parameter[Acts::eBoundTime]);
-
 
         if (boundParam.covariance().has_value()) {
           const auto& covariance = *boundParam.covariance();
@@ -333,10 +387,10 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
         }
         m_truth_vtx_fitted_trk_vtxID.push_back(m_truth_vtx_vx.size() - 1);
       }
+      std::cout << '\n' << std::endl;
     }
   }
 }
-
 
 int ActsExamples::RootVertexPerformanceWriter::getNumberOfTruePriVertices(
     const SimParticleContainer& collection) const {
@@ -362,7 +416,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
   // Exclusive access to the tree while writing
   std::lock_guard<std::mutex> lock(m_writeMutex);
 
-  // Event Number 
+  // Event Number
   m_eventId = ctx.eventNumber;
 
   m_nrecoVtx = vertices.size();
@@ -406,15 +460,20 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
   ACTS_INFO("Total number of reco track-associated truth primary vertices : "
             << m_nVtxReconstructable);
 
-  std::vector<PV > PV_list = getTruthVerticesVec(associatedTruthParticles); 
-  
-  // L296
-  for(size_t i=0; i< PV_list.size(); ++i){
-    std::cout<< "i= " << i  << std::endl;
-    for(size_t j=0; j<PV_list[i].track_ID.size(); ++j){
-      std::cout<< PV_list[i].track_ID[j] << " ";  
+  std::vector<uint32_t> inputPVSelectedTrackIndices =
+      ctx.eventStore.get<std::vector<uint32_t>>(
+          m_cfg.inputPVSelectedTrackIndices);
+
+  std::vector<PV> PV_list = getTruthVerticesVec(associatedTruthParticles,
+                                                inputPVSelectedTrackIndices);
+
+  // Print the list
+  for (size_t i = 0; i < PV_list.size(); ++i) {
+    std::cout << "i= " << i << std::endl;
+    for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
+      std::cout << PV_list[i].track_ID[j] << " ";
     }
-    std::cout<< "\n" << std::endl;
+    std::cout << "\n" << std::endl;
   }
 
   /*****************  Start x,y,z resolution plots here *****************/
@@ -431,25 +490,40 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
         "Not able to match fitted tracks at reconstructed vertex to truth "
         "vertex.");
   } else {
+    std::cout << "Output from Truth Writer Read in" << std::endl;
+    for (auto i = inputPVSelectedTrackIndices.begin();
+         i != inputPVSelectedTrackIndices.end(); ++i)
+      std::cout << *i << ' ';
+    std::cout << '\n' << std::endl;
 
-    writeTruthInfo(PV_list,  associatedTruthParticles, inputFittedTracks);
+    std::cout << "Output tracks from Truth Writer indice" << std::endl;
+    for (int i = 0; i < 200; ++i)
+      std::cout << inputFittedTracks[inputPVSelectedTrackIndices[i]]
+                       .parameters()[Acts::eBoundLoc0]
+                << ' ';
+    std::cout << '\n' << std::endl;
+
+    writeTruthInfo(PV_list, associatedTruthParticles, inputFittedTracks);
     // writeRecoInfo(vertices);
 
     // auto it_assoTruthp = associatedTruthParticles.begin();
     // for (size_t i = 0; i < associatedTruthParticles.size(); i++)
     // {
     //   std::cout<< i << "-th:" << "Associated truth particle "
-    //   << "  paricleId:" << (*it_assoTruthp).particleId() 
-    //   // << "  vertexPrimary:" <<(*it_assoTruthp).particleId().vertexPrimary() 
-    //   // << "  vertexSecondary:" << (*it_assoTruthp).particleId().vertexSecondary()
-    //   << "  x:" << (*it_assoTruthp).position()[0] 
-    //   << "  y:" << (*it_assoTruthp).position()[1] 
-    //   << "  z:" << (*it_assoTruthp).position()[2] 
+    //   << "  paricleId:" << (*it_assoTruthp).particleId()
+    //   // << "  vertexPrimary:"
+    //   <<(*it_assoTruthp).particleId().vertexPrimary()
+    //   // << "  vertexSecondary:" <<
+    //   (*it_assoTruthp).particleId().vertexSecondary()
+    //   << "  x:" << (*it_assoTruthp).position()[0]
+    //   << "  y:" << (*it_assoTruthp).position()[1]
+    //   << "  z:" << (*it_assoTruthp).position()[2]
     //   << "  pt:" << (*it_assoTruthp).transverseMomentum()
-    //   << "  px:" << (*it_assoTruthp).fourMomentum()[0] 
+    //   << "  px:" << (*it_assoTruthp).fourMomentum()[0]
     //   << std::endl;
-    //   // << ", input fitted track z0:" << inputFittedTracks[i].parameters()[1] << std::endl;
-    //   if (it_assoTruthp!=associatedTruthParticles.end())
+    //   // << ", input fitted track z0:" <<
+    //   inputFittedTracks[i].parameters()[1] << std::endl; if
+    //   (it_assoTruthp!=associatedTruthParticles.end())
     //   {
     //     ++it_assoTruthp;
     //   }
@@ -462,17 +536,16 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       m_reco_vtx_vx.push_back(vtx.position().x());
       m_reco_vtx_vy.push_back(vtx.position().y());
       m_reco_vtx_vz.push_back(vtx.position().z());
-      
+
       m_reco_vtx_fitquality_chiSquared.push_back(vtx.fitQuality().first);
       m_reco_vtx_fitquality_nDoF.push_back(vtx.fitQuality().second);
       const auto& reco_vtx_covariance = vtx.covariance();
-      m_reco_vtx_err_vx_vx.push_back(sqrt(reco_vtx_covariance(0,0)));
-      m_reco_vtx_err_vx_vy.push_back(sqrt(reco_vtx_covariance(0,1)));
-      m_reco_vtx_err_vx_vz.push_back(sqrt(reco_vtx_covariance(0,2)));
-      m_reco_vtx_err_vy_vy.push_back(sqrt(reco_vtx_covariance(1,1)));
-      m_reco_vtx_err_vy_vz.push_back(sqrt(reco_vtx_covariance(1,2)));
-      m_reco_vtx_err_vz_vz.push_back(sqrt(reco_vtx_covariance(2,2)));
-
+      m_reco_vtx_err_vx_vx.push_back(sqrt(reco_vtx_covariance(0, 0)));
+      m_reco_vtx_err_vx_vy.push_back(sqrt(reco_vtx_covariance(0, 1)));
+      m_reco_vtx_err_vx_vz.push_back(sqrt(reco_vtx_covariance(0, 2)));
+      m_reco_vtx_err_vy_vy.push_back(sqrt(reco_vtx_covariance(1, 1)));
+      m_reco_vtx_err_vy_vz.push_back(sqrt(reco_vtx_covariance(1, 2)));
+      m_reco_vtx_err_vz_vz.push_back(sqrt(reco_vtx_covariance(2, 2)));
 
       // Store all associated truth particles to current vtx
       SimParticleContainer particleAtVtx;
@@ -482,26 +555,35 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       for (const auto& trk : tracks) {
         Acts::BoundTrackParameters origTrack = *(trk.originalParams);
 
+        std::cout << origTrack.parameters()[0] << ' ';
+
         m_reco_vtx_fitted_trk_d0.push_back(origTrack.parameters()[0]);
         m_reco_vtx_fitted_trk_z0.push_back(origTrack.parameters()[1]);
         m_reco_vtx_fitted_trk_phi.push_back(origTrack.parameters()[2]);
         m_reco_vtx_fitted_trk_theta.push_back(origTrack.parameters()[3]);
         m_reco_vtx_fitted_trk_qp.push_back(origTrack.parameters()[4]);
-        m_reco_vtx_fitted_trk_time.push_back(origTrack.parameters()[5]); 
+        m_reco_vtx_fitted_trk_time.push_back(origTrack.parameters()[5]);
 
         const auto& covariance = *origTrack.covariance();
-        m_reco_vtx_fitted_trk_err_d0.push_back(sqrt(covariance(Acts::eBoundLoc0, Acts::eBoundLoc0)));
-        m_reco_vtx_fitted_trk_err_z0.push_back(sqrt(covariance(Acts::eBoundLoc1, Acts::eBoundLoc1)));
-        m_reco_vtx_fitted_trk_err_phi.push_back(sqrt(covariance(Acts::eBoundPhi, Acts::eBoundPhi)));
-        m_reco_vtx_fitted_trk_err_theta.push_back(sqrt(covariance(Acts::eBoundTheta, Acts::eBoundTheta)));
-        m_reco_vtx_fitted_trk_err_qp.push_back(sqrt(covariance(Acts::eBoundQOverP, Acts::eBoundQOverP)));
-        m_reco_vtx_fitted_trk_err_time.push_back(sqrt(covariance(Acts::eBoundTime, Acts::eBoundTime)));
+        m_reco_vtx_fitted_trk_err_d0.push_back(
+            sqrt(covariance(Acts::eBoundLoc0, Acts::eBoundLoc0)));
+        m_reco_vtx_fitted_trk_err_z0.push_back(
+            sqrt(covariance(Acts::eBoundLoc1, Acts::eBoundLoc1)));
+        m_reco_vtx_fitted_trk_err_phi.push_back(
+            sqrt(covariance(Acts::eBoundPhi, Acts::eBoundPhi)));
+        m_reco_vtx_fitted_trk_err_theta.push_back(
+            sqrt(covariance(Acts::eBoundTheta, Acts::eBoundTheta)));
+        m_reco_vtx_fitted_trk_err_qp.push_back(
+            sqrt(covariance(Acts::eBoundQOverP, Acts::eBoundQOverP)));
+        m_reco_vtx_fitted_trk_err_time.push_back(
+            sqrt(covariance(Acts::eBoundTime, Acts::eBoundTime)));
 
         m_reco_vtx_fitted_trk_chi2Track.push_back(trk.chi2Track);
         m_reco_vtx_fitted_trk_ndf.push_back(trk.ndf);
-        m_reco_vtx_fitted_trk_vertexCompatibility.push_back(trk.vertexCompatibility);
+        m_reco_vtx_fitted_trk_vertexCompatibility.push_back(
+            trk.vertexCompatibility);
         m_reco_vtx_fitted_trk_trackWeight.push_back(trk.trackWeight);
-        
+
         // Current vertex index as vertex ID
         m_reco_vtx_fitted_trk_vtxID.push_back(m_reco_vtx_vx.size() - 1);
 
@@ -595,20 +677,20 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
   m_truth_particle_generation.clear();
   m_truth_particle_subParticle.clear();
 
-  m_truth_vtx_fitted_trk_d0.clear(); 
-  m_truth_vtx_fitted_trk_z0.clear(); 
-  m_truth_vtx_fitted_trk_phi.clear(); 
-  m_truth_vtx_fitted_trk_theta.clear(); 
-  m_truth_vtx_fitted_trk_qp.clear(); 
-  m_truth_vtx_fitted_trk_time.clear(); 
-  m_truth_vtx_fitted_trk_vtxID.clear(); 
+  m_truth_vtx_fitted_trk_d0.clear();
+  m_truth_vtx_fitted_trk_z0.clear();
+  m_truth_vtx_fitted_trk_phi.clear();
+  m_truth_vtx_fitted_trk_theta.clear();
+  m_truth_vtx_fitted_trk_qp.clear();
+  m_truth_vtx_fitted_trk_time.clear();
+  m_truth_vtx_fitted_trk_vtxID.clear();
 
-  m_truth_vtx_fitted_trk_err_d0.clear(); 
-  m_truth_vtx_fitted_trk_err_z0.clear(); 
-  m_truth_vtx_fitted_trk_err_phi.clear(); 
-  m_truth_vtx_fitted_trk_err_theta.clear(); 
-  m_truth_vtx_fitted_trk_err_qp.clear(); 
-  m_truth_vtx_fitted_trk_err_time.clear(); 
+  m_truth_vtx_fitted_trk_err_d0.clear();
+  m_truth_vtx_fitted_trk_err_z0.clear();
+  m_truth_vtx_fitted_trk_err_phi.clear();
+  m_truth_vtx_fitted_trk_err_theta.clear();
+  m_truth_vtx_fitted_trk_err_qp.clear();
+  m_truth_vtx_fitted_trk_err_time.clear();
 
   m_reco_vtx_vx.clear();
   m_reco_vtx_vy.clear();

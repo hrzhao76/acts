@@ -58,6 +58,12 @@ ActsExamples::AdaptiveMultiVertexFinderAlgorithm::execute(
   // retrieve input tracks and convert into the expected format
   const auto& inputTrackParameters =
       ctx.eventStore.get<TrackParametersContainer>(m_cfg.inputTrackParameters);
+
+  std::cout << "Output from AMVF Read in" << std::endl;
+  for (int i = 0; i < inputTrackParameters.size(); ++i)
+    std::cout << inputTrackParameters[i].parameters()[Acts::eBoundLoc0] << ' ';
+  std::cout << '\n' << std::endl;
+
   const auto& inputTrackPointers =
       makeTrackParametersPointerContainer(inputTrackParameters);
 

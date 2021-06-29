@@ -50,6 +50,9 @@ class RootVertexPerformanceWriter final
     std::string inputVertices;
     /// Input reconstruction time.
     std::string inputTime;
+    /// Input Primary vertexing selected tracks.
+    std::string inputPVSelectedTrackIndices;
+
     /// Output directory.
     std::string outputDir;
     /// Output filename.
@@ -57,7 +60,7 @@ class RootVertexPerformanceWriter final
     /// Name of the output tree.
     std::string outputTreename = "vertextree";
     /// Name of the output tree of truth info.
-    std::string outputTreename_Truth = "Truth_Vertex";
+    std::string outputTreename_Truth = "Truth_Vertex_PV_Selected";
     /// Name of the output tree of reco info.
     std::string outputTreename_Reco = "Reco_Vertex";
     /// File access mode.
@@ -90,14 +93,14 @@ class RootVertexPerformanceWriter final
  private:
   Config m_cfg;             ///< The config class
   std::mutex m_writeMutex;  ///< Mutex used to protect multi-threaded writes
-  TFile* m_outputFile{nullptr};  ///< The output file
-  TTree* m_outputTree{nullptr};  ///< The output tree
+  TFile* m_outputFile{nullptr};        ///< The output file
+  TTree* m_outputTree{nullptr};        ///< The output tree
   TTree* m_outputTree_Truth{nullptr};  ///< The output tree of truth info
-  TTree* m_outputTree_Reco{nullptr};  ///< The output tree of reco info 
+  TTree* m_outputTree_Reco{nullptr};   ///< The output tree of reco info
 
-  int m_eventId{0}; 
+  int m_eventId{0};
 
-  /// For truth vtx information 
+  /// For truth vtx information
   std::vector<double> m_truth_vtx_vx;
   std::vector<double> m_truth_vtx_vy;
   std::vector<double> m_truth_vtx_vz;
@@ -138,8 +141,7 @@ class RootVertexPerformanceWriter final
   std::vector<uint32_t> m_truth_particle_generation;
   std::vector<uint32_t> m_truth_particle_subParticle;
 
-
-  /// The track parameter associated to the truth vtx 
+  /// The track parameter associated to the truth vtx
   std::vector<double> m_truth_vtx_fitted_trk_d0;
   std::vector<double> m_truth_vtx_fitted_trk_z0;
   std::vector<double> m_truth_vtx_fitted_trk_phi;
@@ -156,8 +158,7 @@ class RootVertexPerformanceWriter final
 
   std::vector<int> m_truth_vtx_fitted_trk_vtxID;
 
-
-  /// For reco vtx information 
+  /// For reco vtx information
   std::vector<double> m_reco_vtx_vx;
   std::vector<double> m_reco_vtx_vy;
   std::vector<double> m_reco_vtx_vz;
@@ -172,13 +173,13 @@ class RootVertexPerformanceWriter final
   std::vector<double> m_reco_vtx_err_vy_vz;
   std::vector<double> m_reco_vtx_err_vz_vz;
 
-  /// The track parameter associated to the reco vtx 
+  /// The track parameter associated to the reco vtx
   std::vector<double> m_reco_vtx_fitted_trk_d0;
   std::vector<double> m_reco_vtx_fitted_trk_z0;
   std::vector<double> m_reco_vtx_fitted_trk_phi;
   std::vector<double> m_reco_vtx_fitted_trk_theta;
   std::vector<double> m_reco_vtx_fitted_trk_qp;
-  std::vector<double> m_reco_vtx_fitted_trk_time; 
+  std::vector<double> m_reco_vtx_fitted_trk_time;
 
   std::vector<double> m_reco_vtx_fitted_trk_err_d0;
   std::vector<double> m_reco_vtx_fitted_trk_err_z0;
@@ -215,15 +216,15 @@ class RootVertexPerformanceWriter final
   int getNumberOfTruePriVertices(const SimParticleContainer& collection) const;
 
   std::vector<PV> getTruthVerticesVec(
-      const SimParticleContainer& collection);
+      const SimParticleContainer& collection,
+      std::vector<uint32_t> inputPVSelectedTrackIndices);
 
-  void writeTruthInfo(std::vector<PV> PV_list, 
-  const SimParticleContainer& collection, 
-  const TrackParametersContainer& inputFittedTracks);
+  void writeTruthInfo(std::vector<PV> PV_list,
+                      const SimParticleContainer& collection,
+                      const TrackParametersContainer& inputFittedTracks);
 
-  void writeRecoInfo(const std::vector<Acts::Vertex<Acts::BoundTrackParameters>>& vertices);
-
-
+  void writeRecoInfo(
+      const std::vector<Acts::Vertex<Acts::BoundTrackParameters>>& vertices);
 };
 
 }  // namespace ActsExamples
