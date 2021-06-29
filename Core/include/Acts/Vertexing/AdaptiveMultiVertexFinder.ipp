@@ -18,6 +18,12 @@ auto Acts::AdaptiveMultiVertexFinder<vfitter_t, sfinder_t>::find(
   }
   // Original tracks
   const std::vector<const InputTrack_t*>& origTracks = allTracks;
+  std::cout << "tracks readin from AdaptiveMultiVertexFinder.ipp " << std::endl;
+  for (unsigned long int i = 0; i < origTracks.size(); ++i)
+    std::cout << (*origTracks[i]).parameters()[Acts::eBoundLoc0] << ' ';
+  std::cout << "\n tracks readin from AdaptiveMultiVertexFinder.ipp size: "
+            << origTracks.size() << std::endl;
+  std::cout << '\n' << std::endl;
 
   // Seed tracks
   std::vector<const InputTrack_t*> seedTracks = allTracks;
@@ -586,5 +592,22 @@ auto Acts::AdaptiveMultiVertexFinder<vfitter_t, sfinder_t>::getVertexOutputList(
     outVtx.setTracksAtVertex(tracksAtVtx);
     outputVec.push_back(outVtx);
   }
+
+  std::cout << "After AMVF: " << std::endl;
+
+  int num_tracks = 0;
+  for (const auto& vtx : outputVec) {
+    const auto tracks = vtx.tracks();
+    num_tracks = num_tracks + tracks.size();
+    for (const auto& trk : tracks) {
+      Acts::BoundTrackParameters origTrack = *(trk.originalParams);
+      std::cout << origTrack.parameters()[0] << ' ';
+    }
+    std::cout << "\n" << std::endl;
+  }
+
+  std::cout << "\n tracks output from AdaptiveMultiVertexFinder.ipp size: "
+            << num_tracks << std::endl;
+
   return Result<std::vector<Vertex<InputTrack_t>>>(outputVec);
 }

@@ -354,7 +354,7 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
             inputFittedTracks[PV_list[i].track_ID[j]];  // TODO - Check
         const auto& parameter = boundParam.parameters();
 
-        std::cout << parameter[Acts::eBoundLoc0] << ' ';
+        // std::cout << parameter[Acts::eBoundLoc0] << ' ';
 
         m_truth_vtx_fitted_trk_d0.push_back(parameter[Acts::eBoundLoc0]);
         m_truth_vtx_fitted_trk_z0.push_back(parameter[Acts::eBoundLoc1]);
@@ -387,7 +387,7 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
         }
         m_truth_vtx_fitted_trk_vtxID.push_back(m_truth_vtx_vx.size() - 1);
       }
-      std::cout << '\n' << std::endl;
+      // std::cout << '\n' << std::endl;
     }
   }
 }
@@ -468,6 +468,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
                                                 inputPVSelectedTrackIndices);
 
   // Print the list
+  std::cout << "Truth Primary Vertex List after selection" << std::endl;
   for (size_t i = 0; i < PV_list.size(); ++i) {
     std::cout << "i= " << i << std::endl;
     for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
@@ -484,24 +485,25 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       ctx.eventStore.get<std::vector<Acts::BoundTrackParameters>>(
           m_cfg.inputFittedTracks);
 
+  int m_reco_tracks = 0;
   if (associatedTruthParticles.size() != inputFittedTracks.size()) {
     ACTS_WARNING(
         "Number of fitted tracks and associated truth particles do not match. "
         "Not able to match fitted tracks at reconstructed vertex to truth "
         "vertex.");
   } else {
-    std::cout << "Output from Truth Writer Read in" << std::endl;
-    for (auto i = inputPVSelectedTrackIndices.begin();
-         i != inputPVSelectedTrackIndices.end(); ++i)
-      std::cout << *i << ' ';
-    std::cout << '\n' << std::endl;
+    // std::cout << "Output from Truth Writer Read in" << std::endl;
+    // for (auto i = inputPVSelectedTrackIndices.begin();
+    //      i != inputPVSelectedTrackIndices.end(); ++i)
+    //   std::cout << *i << ' ';
+    // std::cout << '\n' << std::endl;
 
-    std::cout << "Output tracks from Truth Writer indice" << std::endl;
-    for (int i = 0; i < 200; ++i)
-      std::cout << inputFittedTracks[inputPVSelectedTrackIndices[i]]
-                       .parameters()[Acts::eBoundLoc0]
-                << ' ';
-    std::cout << '\n' << std::endl;
+    // std::cout << "Output tracks from Truth Writer indices" << std::endl;
+    // for (int i = 0; i < inputPVSelectedTrackIndices.size(); ++i)
+    //   std::cout << inputFittedTracks[inputPVSelectedTrackIndices[i]]
+    //                    .parameters()[Acts::eBoundLoc0]
+    //             << ' ';
+    // std::cout << '\n' << std::endl;
 
     writeTruthInfo(PV_list, associatedTruthParticles, inputFittedTracks);
     // writeRecoInfo(vertices);
@@ -530,6 +532,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     // }
     // Loop over all reco vertices and find associated truth particles
     std::vector<SimParticleContainer> truthParticlesAtVtxContainer;
+
     for (const auto& vtx : vertices) {
       const auto tracks = vtx.tracks();
 
@@ -551,11 +554,12 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       SimParticleContainer particleAtVtx;
 
       std::vector<int> contributingTruthVertices;
+      m_reco_tracks += tracks.size();
 
       for (const auto& trk : tracks) {
         Acts::BoundTrackParameters origTrack = *(trk.originalParams);
 
-        std::cout << origTrack.parameters()[0] << ' ';
+        // std::cout << origTrack.parameters()[0] << ' ';
 
         m_reco_vtx_fitted_trk_d0.push_back(origTrack.parameters()[0]);
         m_reco_vtx_fitted_trk_z0.push_back(origTrack.parameters()[1]);
@@ -641,6 +645,10 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       }
     }  // end loop vertices
   }
+
+  std::cout << "m_reco_tracks size from performance writer: " << m_reco_tracks
+            << std::endl;
+  std::cout << "\n" << std::endl;
 
   // Retrieve and set reconstruction time
   const auto& reconstructionTimeMS = ctx.eventStore.get<int>(m_cfg.inputTime);

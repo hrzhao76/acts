@@ -89,7 +89,9 @@ int main(int argc, char* argv[]) {
   trackSelectorConfig.outputTrackIndices = "outputTrackIndices";
   trackSelectorConfig.removeNeutral = true;
   trackSelectorConfig.absEtaMax = vars["vertexing-eta-max"].as<double>();
+  trackSelectorConfig.absEtaMin = -vars["vertexing-eta-max"].as<double>();
   trackSelectorConfig.loc0Max = vars["vertexing-rho-max"].as<double>() * 1_mm;
+  trackSelectorConfig.loc0Min = -vars["vertexing-rho-max"].as<double>() * 1_mm;
   trackSelectorConfig.ptMin = vars["vertexing-pt-min"].as<double>() * 1_MeV;
   sequencer.addAlgorithm(
       std::make_shared<TrackSelector>(trackSelectorConfig, logLevel));
