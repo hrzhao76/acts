@@ -507,7 +507,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       ctx.eventStore.get<std::vector<Acts::BoundTrackParameters>>(
           m_cfg.inputFittedTracks);
 
-  int m_reco_tracks = 0;
+  // int m_reco_tracks = 0;
   if (associatedTruthParticles.size() != inputFittedTracks.size()) {
     ACTS_WARNING(
         "Number of fitted tracks and associated truth particles do not match. "
@@ -576,7 +576,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
       SimParticleContainer particleAtVtx;
 
       std::vector<int> contributingTruthVertices;
-      m_reco_tracks += tracks.size();
+      // m_reco_tracks += tracks.size();
 
       for (const auto& trk : tracks) {
         Acts::BoundTrackParameters origTrack = *(trk.originalParams);
@@ -668,9 +668,9 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     }  // end loop vertices
   }
 
-  std::cout << "m_reco_tracks size from performance writer: " << m_reco_tracks
-            << std::endl;
-  std::cout << "\n" << std::endl;
+  // std::cout << "m_reco_tracks size from performance writer: " << m_reco_tracks
+  //           << std::endl;
+  // std::cout << "\n" << std::endl;
 
   // Retrieve and set reconstruction time
   const auto& reconstructionTimeMS = ctx.eventStore.get<int>(m_cfg.inputTime);

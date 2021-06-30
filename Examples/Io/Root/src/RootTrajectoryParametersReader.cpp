@@ -195,7 +195,7 @@ ActsExamples::ProcessCode ActsExamples::RootTrajectoryParametersReader::read(
     }
 
     unsigned int nTruthParticles = m_t_vx->size();
-    ACTS_INFO("nTruthParticles Size " << nTruthParticles << entry);
+    // ACTS_INFO("nTruthParticles Size " << nTruthParticles << entry);
     for (unsigned int i = 0; i < nTruthParticles; i++) {
       Acts::PdgParticle pdg = static_cast<Acts::PdgParticle>((*m_t_particleType)[i]);
       ActsFatras::Particle truthParticle((*m_t_barcode)[i], pdg, (*m_t_q)[i], (*m_t_m)[i]);
