@@ -77,9 +77,8 @@ ActsExamples::ProcessCode ActsExamples::TrackSelector::execute(
   outputTrackIndices.shrink_to_fit();
 
   // std::cout << "Output from Track Selector Read out" << std::endl;
-
-  // for (auto i = outputTrackIndices.begin(); i != outputTrackIndices.end();
-  // ++i)
+  // std::cout << "Track selector indices" << std::endl;
+  // for (auto i = outputTrackIndices.begin(); i != outputTrackIndices.end(); ++i)
   //   std::cout << *i << ' ';
   // std::cout << '\n' << std::endl;
 

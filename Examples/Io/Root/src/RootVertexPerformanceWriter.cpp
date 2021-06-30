@@ -295,12 +295,31 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
     std::vector<PV> PV_list, const SimParticleContainer& collection,
     const TrackParametersContainer& inputFittedTracks) {
   auto particle_it = collection.cbegin();
+  int idx_particle = 0;
+
   for (size_t i = 0; i < PV_list.size(); ++i) {
-    if (PV_list[i].track_ID.size() > 1) {
+    if (PV_list[i].track_ID.size() > 1) { // Only store reconstruble vertices 
       m_truth_vtx_vx.push_back(PV_list[i].PV_loc[0]);
       m_truth_vtx_vy.push_back(PV_list[i].PV_loc[1]);
       m_truth_vtx_vz.push_back(PV_list[i].PV_loc[2]);
-      while ((*particle_it).particleId().vertexPrimary() == (i + 1)) {
+      // int idxs_track_selected = 0;
+
+      
+      for(size_t j = 0; j < PV_list[i].track_ID.size(); j++) {
+        // while ((*particle_it).particleId().vertexPrimary() == (i + 1)){
+        // std::cout << PV_list[i].track_ID[idx_track_selected] << ' ';
+        
+        // if (idx_particle != PV_list[i].track_ID[idx_track_selected]){
+        // if (idx_particle != PV_list[i].track_ID[j]){
+        //   ++particle_it;
+        //   ++idx_particle;
+        //   continue;
+        // }
+        while (idx_particle != PV_list[i].track_ID[j]){
+          ++particle_it;
+          ++idx_particle;
+        }
+        // std::cout << PV_list[i].track_ID[j] << ' ' << idx_particle << std::endl;
         /* Copy from particle writer */
         m_truth_particle_Id.push_back((*particle_it).particleId().value());
         m_truth_particle_Type.push_back((*particle_it).pdg());
@@ -345,16 +364,15 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
             (*particle_it).particleId().generation());
         m_truth_particle_subParticle.push_back(
             (*particle_it).particleId().subParticle());
-
         ++particle_it;
+        ++idx_particle;
+        // ++idx_track_selected;
+        // }
       }
-
       for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
         const auto& boundParam =
             inputFittedTracks[PV_list[i].track_ID[j]];  // TODO - Check
         const auto& parameter = boundParam.parameters();
-
-        // std::cout << parameter[Acts::eBoundLoc0] << ' ';
 
         m_truth_vtx_fitted_trk_d0.push_back(parameter[Acts::eBoundLoc0]);
         m_truth_vtx_fitted_trk_z0.push_back(parameter[Acts::eBoundLoc1]);
@@ -468,14 +486,18 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
                                                 inputPVSelectedTrackIndices);
 
   // Print the list
-  std::cout << "Truth Primary Vertex List after selection" << std::endl;
-  for (size_t i = 0; i < PV_list.size(); ++i) {
-    std::cout << "i= " << i << std::endl;
-    for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
-      std::cout << PV_list[i].track_ID[j] << " ";
-    }
-    std::cout << "\n" << std::endl;
-  }
+  // std::cout << "Truth Primary Vertex List after selection" << std::endl;
+  // int truth_PV_size = 0 ;
+  // for (size_t i = 0; i < PV_list.size(); ++i) {
+  //   truth_PV_size = truth_PV_size + PV_list[i].track_ID.size();
+  //   std::cout << "i= " << i << std::endl;
+  //   for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
+  //     std::cout << PV_list[i].track_ID[j] << " ";
+  //   }
+  //   std::cout << "\n" << std::endl;
+  // }
+
+  // std::cout << "truth_PV_size: " << truth_PV_size <<"\n" << std::endl;
 
   /*****************  Start x,y,z resolution plots here *****************/
   // Matching tracks at vertex to fitted tracks that are in turn matched
@@ -499,7 +521,7 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     // std::cout << '\n' << std::endl;
 
     // std::cout << "Output tracks from Truth Writer indices" << std::endl;
-    // for (int i = 0; i < inputPVSelectedTrackIndices.size(); ++i)
+    // for (unsigned int i = 0; i < inputPVSelectedTrackIndices.size(); ++i)
     //   std::cout << inputFittedTracks[inputPVSelectedTrackIndices[i]]
     //                    .parameters()[Acts::eBoundLoc0]
     //             << ' ';
@@ -514,9 +536,9 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     //   std::cout<< i << "-th:" << "Associated truth particle "
     //   << "  paricleId:" << (*it_assoTruthp).particleId()
     //   // << "  vertexPrimary:"
-    //   <<(*it_assoTruthp).particleId().vertexPrimary()
+    //   // <<(*it_assoTruthp).particleId()
     //   // << "  vertexSecondary:" <<
-    //   (*it_assoTruthp).particleId().vertexSecondary()
+    //   // (*it_assoTruthp).particleId().vertexSecondary()
     //   << "  x:" << (*it_assoTruthp).position()[0]
     //   << "  y:" << (*it_assoTruthp).position()[1]
     //   << "  z:" << (*it_assoTruthp).position()[2]
@@ -524,8 +546,8 @@ ActsExamples::ProcessCode ActsExamples::RootVertexPerformanceWriter::writeT(
     //   << "  px:" << (*it_assoTruthp).fourMomentum()[0]
     //   << std::endl;
     //   // << ", input fitted track z0:" <<
-    //   inputFittedTracks[i].parameters()[1] << std::endl; if
-    //   (it_assoTruthp!=associatedTruthParticles.end())
+    //   // inputFittedTracks[i].parameters()[1] << std::endl; 
+    //   if(it_assoTruthp!=associatedTruthParticles.end())
     //   {
     //     ++it_assoTruthp;
     //   }
