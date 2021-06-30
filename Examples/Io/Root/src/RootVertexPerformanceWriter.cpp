@@ -299,26 +299,32 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
 
   for (size_t i = 0; i < PV_list.size(); ++i) {
     if (PV_list[i].track_ID.size() > 1) { // Only store reconstruble vertices 
+    // std::cout << i << "-th primary vertices" << std::endl;
       m_truth_vtx_vx.push_back(PV_list[i].PV_loc[0]);
       m_truth_vtx_vy.push_back(PV_list[i].PV_loc[1]);
       m_truth_vtx_vz.push_back(PV_list[i].PV_loc[2]);
-      // int idxs_track_selected = 0;
+      // unsigned long idx_track_selected = 0;
 
       
-      for(size_t j = 0; j < PV_list[i].track_ID.size(); j++) {
-        // while ((*particle_it).particleId().vertexPrimary() == (i + 1)){
+      for(unsigned long k = 0; k < PV_list[i].track_ID.size(); k++) {
+      // std::cout << (*particle_it).particleId().vertexPrimary() << std::endl;
+      // while ((*particle_it).particleId().vertexPrimary() == (i+1) ){
         // std::cout << PV_list[i].track_ID[idx_track_selected] << ' ';
         
         // if (idx_particle != PV_list[i].track_ID[idx_track_selected]){
-        // if (idx_particle != PV_list[i].track_ID[j]){
+        // if (idx_particle != PV_list[i].track_ID[k]){
         //   ++particle_it;
         //   ++idx_particle;
         //   continue;
         // }
-        while (idx_particle != PV_list[i].track_ID[j]){
+
+        
+        while (idx_particle != PV_list[i].track_ID[k]){
           ++particle_it;
           ++idx_particle;
         }
+
+        // std::cout << idx_particle << ' ';
         // std::cout << PV_list[i].track_ID[j] << ' ' << idx_particle << std::endl;
         /* Copy from particle writer */
         m_truth_particle_Id.push_back((*particle_it).particleId().value());
@@ -364,11 +370,15 @@ void ActsExamples::RootVertexPerformanceWriter::writeTruthInfo(
             (*particle_it).particleId().generation());
         m_truth_particle_subParticle.push_back(
             (*particle_it).particleId().subParticle());
-        ++particle_it;
-        ++idx_particle;
-        // ++idx_track_selected;
+        // ++particle_it;
+        // ++idx_particle; 
+        // if(idx_track_selected < PV_list[i].track_ID.size()){
+        //   ++idx_track_selected;
+        // }
+        
         // }
       }
+
       for (size_t j = 0; j < PV_list[i].track_ID.size(); ++j) {
         const auto& boundParam =
             inputFittedTracks[PV_list[i].track_ID[j]];  // TODO - Check
